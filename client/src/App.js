@@ -6,15 +6,15 @@ import Tracker from './components/Tracker';
 import Header from './components/Header';
 
 let baseLogs = [
-  { habitId: 2, date: new Date(2021, 3, 10) },
-  { habitId: 2, date: new Date(2021, 3, 12) },
-  { habitId: 2, date: new Date(2021, 3, 13) },
-  { habitId: 2, date: new Date(2021, 3, 9) },
-  { habitId: 3, date: new Date(2021, 3, 10) },
-  { habitId: 3, date: new Date(2021, 3, 9) },
-  { habitId: 4, date: new Date(2021, 3, 10) },
-  { habitId: 4, date: new Date(2021, 2, 10) },
-  { habitId: 4, date: new Date(2021, 2, 11) },
+  { habitId: 2, date: new Date(Date.UTC(2021, 3, 10)) },
+  { habitId: 2, date: new Date(Date.UTC(2021, 3, 12)) },
+  { habitId: 2, date: new Date(Date.UTC(2021, 3, 13)) },
+  { habitId: 2, date: new Date(Date.UTC(2021, 3, 9)) },
+  { habitId: 3, date: new Date(Date.UTC(2021, 3, 10)) },
+  { habitId: 3, date: new Date(Date.UTC(2021, 3, 9)) },
+  { habitId: 4, date: new Date(Date.UTC(2021, 3, 10)) },
+  { habitId: 4, date: new Date(Date.UTC(2021, 2, 10)) },
+  { habitId: 4, date: new Date(Date.UTC(2021, 2, 11)) },
 ];
 
 let baseHabits = [
@@ -29,7 +29,7 @@ const logGroupbyHabit = (array) =>
 
 const App = () => {
   const today = new Date();
-  const [month, setMonth] = useState(new Date(today.getFullYear(), today.getMonth()));
+  const [month, setMonth] = useState(new Date(Date.UTC(today.getFullYear(), today.getMonth())));
   const [habits, setHabits] = useState([]);
   const [logs, setLogs] = useState([]);
   const [username, setUsername] = useState('');
@@ -47,10 +47,10 @@ const App = () => {
   }, [month]);
 
   const handleIncrementMonth = () => {
-    setMonth(addMonths(new Date(month.getFullYear(), month.getMonth()), 1));
+    setMonth(addMonths(new Date(Date.UTC(month.getFullYear(), month.getMonth())), 1));
   };
   const handleDecrementMonth = () => {
-    setMonth(subMonths(new Date(month.getFullYear(), month.getMonth()), 1));
+    setMonth(subMonths(new Date(Date.UTC(month.getFullYear(), month.getMonth())), 1));
   };
 
   const handleLogin = (event) => {
@@ -94,7 +94,9 @@ const App = () => {
       );
     } else {
       // update database
-      baseLogs.push({ habitId, date: new Date(month.getFullYear(), month.getMonth(), day) });
+      const habit = { habitId, date: new Date(Date.UTC(month.getFullYear(), month.getMonth(), day)) };
+      console.log('adding new log:', habit, habit.date.toJSON());
+      baseLogs.push(habit);
       // update view
       newLogs.set(habitId, [...(newLogs.get(habitId) || []), day]);
     }
