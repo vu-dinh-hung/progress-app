@@ -1,7 +1,8 @@
-import './App.css';
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { addMonths, subMonths, isSameMonth } from 'date-fns';
 import { Tabs, Tab } from 'react-bootstrap';
+import './App.css';
 import Tracker from './components/Tracker';
 import Header from './components/Header';
 
@@ -24,9 +25,6 @@ let baseHabits = [
   { id: 4, name: 'sleep early' },
 ];
 
-const logGroupbyHabit = (array) =>
-  array.reduce((map, l) => map.set(l.habitId, [...(map.get(l.habitId) || []), l.date.getDate()]), new Map());
-
 const App = () => {
   const today = new Date();
   const [month, setMonth] = useState(new Date(Date.UTC(today.getFullYear(), today.getMonth())));
@@ -42,8 +40,11 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const rawLogs = baseLogs.filter((log) => isSameMonth(log.date, month));
-    setLogs(logGroupbyHabit(rawLogs));
+    axios.get('/logs').then((res) => {
+      console.log(res.data);
+      const logsThisMonth = res.data.filter((log) => isSameMonth(new Date(log.date), month));
+      setLogs(logsThisMonth);
+    });
   }, [month]);
 
   const handleIncrementMonth = () => {
@@ -79,28 +80,31 @@ const App = () => {
     setNewHabit('');
   };
 
-  const handleToggleCell = (day, habitId) => {
-    console.log('clicked cell', habitId, day);
+  const handleToggleCell = async (cellDay, habitId, cellIsChecked) => {
+    console.log('----------------clicked cell', habitId, cellDay);
 
-    const newLogs = new Map();
-    logs.forEach((d, habitId) => newLogs.set(habitId, [...logs.get(habitId)]));
-    if (logs.get(habitId) && logs.get(habitId).includes(day)) {
+    let newLogs = [...logs];
+    if (cellIsChecked) {
       // update database
-      baseLogs = baseLogs.filter((log) => !(log.habitId === habitId && log.date.getDate() === day));
+      const idToDelete = logs.find((log) => log.habitId === habitId && new Date(log.date).getDate() === cellDay).id;
+      axios.delete(`/logs/${idToDelete}`);
       // update view
-      newLogs.set(
-        habitId,
-        newLogs.get(habitId).filter((d) => d !== day)
-      );
+      newLogs = newLogs.filter((log) => !(log.habitId === habitId && new Date(log.date).getDate() === cellDay));
     } else {
       // update database
-      const habit = { habitId, date: new Date(Date.UTC(month.getFullYear(), month.getMonth(), day)) };
-      console.log('adding new log:', habit, habit.date.toJSON());
-      baseLogs.push(habit);
+      const res = await axios.get('/logs');
+      let maxId = Math.max(...res.data.map((log) => log.id));
+      console.log('maxId:', maxId);
+      const habit = {
+        id: maxId + 1,
+        habitId,
+        date: new Date(Date.UTC(month.getFullYear(), month.getMonth(), cellDay)),
+      };
+      await axios.post('/logs', habit);
       // update view
-      newLogs.set(habitId, [...(newLogs.get(habitId) || []), day]);
+      newLogs.push(habit);
     }
-    console.log(baseLogs);
+
     setLogs(newLogs);
   };
 
