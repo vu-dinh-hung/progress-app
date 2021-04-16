@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { addMonths, subMonths, isSameMonth } from 'date-fns';
+import { addMonths, subMonths } from 'date-fns';
 import { Tabs, Tab } from 'react-bootstrap';
 import './App.css';
 import Tracker from './components/Tracker';
@@ -28,10 +28,9 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    axios.get('/api/logs').then((res) => {
+    axios.get(`/api/logs?yearmonth=${'' + month.getFullYear() + month.getMonth()}`).then((res) => {
       console.log(res.data);
-      const logsThisMonth = res.data.filter((log) => isSameMonth(new Date(log.date), month));
-      setLogs(logsThisMonth);
+      setLogs(res.data);
     });
   }, [month]);
 
