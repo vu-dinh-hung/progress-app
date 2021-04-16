@@ -6,18 +6,6 @@ import './App.css';
 import Tracker from './components/Tracker';
 import Header from './components/Header';
 
-let baseLogs = [
-  { habitId: 2, date: new Date(Date.UTC(2021, 3, 10)) },
-  { habitId: 2, date: new Date(Date.UTC(2021, 3, 12)) },
-  { habitId: 2, date: new Date(Date.UTC(2021, 3, 13)) },
-  { habitId: 2, date: new Date(Date.UTC(2021, 3, 9)) },
-  { habitId: 3, date: new Date(Date.UTC(2021, 3, 10)) },
-  { habitId: 3, date: new Date(Date.UTC(2021, 3, 9)) },
-  { habitId: 4, date: new Date(Date.UTC(2021, 3, 10)) },
-  { habitId: 4, date: new Date(Date.UTC(2021, 2, 10)) },
-  { habitId: 4, date: new Date(Date.UTC(2021, 2, 11)) },
-];
-
 let baseHabits = [
   { id: 1, name: 'code' },
   { id: 2, name: 'run' },
@@ -40,7 +28,7 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    axios.get('/logs').then((res) => {
+    axios.get('/api/logs').then((res) => {
       console.log(res.data);
       const logsThisMonth = res.data.filter((log) => isSameMonth(new Date(log.date), month));
       setLogs(logsThisMonth);
@@ -87,22 +75,21 @@ const App = () => {
     if (cellIsChecked) {
       // update database
       const idToDelete = logs.find((log) => log.habitId === habitId && new Date(log.date).getDate() === cellDay).id;
-      axios.delete(`/logs/${idToDelete}`);
+      axios.delete(`api/logs/${idToDelete}`);
       // update view
       newLogs = newLogs.filter((log) => !(log.habitId === habitId && new Date(log.date).getDate() === cellDay));
     } else {
       // update database
-      const res = await axios.get('/logs');
-      let maxId = Math.max(...res.data.map((log) => log.id));
-      console.log('maxId:', maxId);
-      const habit = {
-        id: maxId + 1,
+      // const res = await axios.get('/logs');
+      // let maxId = Math.max(...res.data.map((log) => log.id));
+      // console.log('maxId:', maxId);
+      const log = {
         habitId,
         date: new Date(Date.UTC(month.getFullYear(), month.getMonth(), cellDay)),
       };
-      await axios.post('/logs', habit);
+      const response = await axios.post('/api/logs', log);
       // update view
-      newLogs.push(habit);
+      newLogs.push(response.data);
     }
 
     setLogs(newLogs);
