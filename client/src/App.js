@@ -6,13 +6,6 @@ import './App.css';
 import Tracker from './components/Tracker';
 import Header from './components/Header';
 
-let baseHabits = [
-  { id: 1, name: 'code' },
-  { id: 2, name: 'run' },
-  { id: 3, name: 'morning pullup' },
-  { id: 4, name: 'sleep early' },
-];
-
 const App = () => {
   const today = new Date();
   const [month, setMonth] = useState(new Date(Date.UTC(today.getFullYear(), today.getMonth())));
@@ -24,7 +17,9 @@ const App = () => {
   const [newHabit, setNewHabit] = useState('');
 
   useEffect(() => {
-    setHabits(baseHabits);
+    axios.get('/api/habits').then((res) => {
+      setHabits(res.data);
+    });
   }, []);
 
   useEffect(() => {
@@ -48,23 +43,16 @@ const App = () => {
     setPassword('');
   };
 
-  const handleClickShowHabitForm = () => {
-    console.log('adding habit!!');
-    setShowHabitForm(true);
-  };
+  const handleClickShowHabitForm = () => setShowHabitForm(true);
+  const handleCancelShowHabitForm = () => setShowHabitForm(false);
 
-  const handleCancelShowHabitForm = () => {
-    console.log('cancelling add habit!!');
-    setShowHabitForm(false);
-  };
-
-  const handleSubmitHabit = (event) => {
+  const handleSubmitHabit = async (event) => {
     event.preventDefault();
-    console.log('adding habit', newHabit);
     const habit = { id: habits.length + 1, name: newHabit };
-    setHabits(habits.concat(habit));
-    baseHabits.push(habit);
+    const response = await axios.post('/api/habits/', habit);
+    setHabits(habits.concat(response.data));
     setNewHabit('');
+    setShowHabitForm(false);
   };
 
   const handleToggleCell = async (cellDay, habitId, cellIsChecked) => {
