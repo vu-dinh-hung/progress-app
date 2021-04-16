@@ -29,12 +29,8 @@ const App = () => {
     });
   }, [month]);
 
-  const handleIncrementMonth = () => {
-    setMonth(addMonths(new Date(Date.UTC(month.getFullYear(), month.getMonth())), 1));
-  };
-  const handleDecrementMonth = () => {
-    setMonth(subMonths(new Date(Date.UTC(month.getFullYear(), month.getMonth())), 1));
-  };
+  const handleIncrementMonth = () => setMonth(addMonths(new Date(Date.UTC(month.getFullYear(), month.getMonth())), 1));
+  const handleDecrementMonth = () => setMonth(subMonths(new Date(Date.UTC(month.getFullYear(), month.getMonth())), 1));
 
   const handleLogin = (event) => {
     event.preventDefault();
@@ -67,9 +63,6 @@ const App = () => {
       newLogs = newLogs.filter((log) => !(log.habitId === habitId && new Date(log.date).getDate() === cellDay));
     } else {
       // update database
-      // const res = await axios.get('/logs');
-      // let maxId = Math.max(...res.data.map((log) => log.id));
-      // console.log('maxId:', maxId);
       const log = {
         habitId,
         date: new Date(Date.UTC(month.getFullYear(), month.getMonth(), cellDay)),

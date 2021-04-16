@@ -35,7 +35,7 @@ router.put('/:id', (req, res) => {
     habits = habits.map((h) => (h.id === id ? newHabit : h));
     res.json(newHabit);
   } else {
-    res.status(404).json({ error: 'habit id not found' });
+    res.status(404).end();
   }
 });
 

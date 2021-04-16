@@ -12,7 +12,7 @@ let logs = [
   { id: 9, habitId: 4, date: '2021-03-11T00:00:00.000Z' },
 ];
 
-router.get('/', async (req, res) => {
+router.get('/', (req, res) => {
   const yearmonth = req.query.yearmonth;
   if (yearmonth) {
     const queryMonth = new Date(Date.UTC(Number(yearmonth.slice(0, 4)), Number(yearmonth.slice(4))));
@@ -27,7 +27,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', (req, res) => {
   const log = logs.find((log) => log.id === Number(req.params.id));
   if (log) {
     res.json(log);
@@ -37,17 +37,13 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', (req, res) => {
-  const maxId = Math.max(...logs.map((log) => log.id));
-  const log = {
-    id: maxId + 1,
-    habitId: req.body.habitId,
-    date: req.body.date,
-  };
+  const id = Math.max(...logs.map((log) => log.id)) + 1;
+  const log = { id, habitId: req.body.habitId, date: req.body.date };
   logs.push(log);
-  res.json(log);
+  res.status(201).json(log);
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', (req, res) => {
   const id = Number(req.params.id);
   const log = logs.find((log) => log.id === id);
   if (log) {
@@ -63,9 +59,8 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
-  const id = Number(req.params.id);
-  logs = logs.filter((log) => log.id !== id);
+router.delete('/:id', (req, res) => {
+  logs = logs.filter((log) => log.id !== Number(req.params.id));
   res.status(204).end();
 });
 
