@@ -20,6 +20,15 @@ const Tracker = ({
 }) => {
   const daysInMonth = getDaysInMonth(month);
 
+  const groupbyLogByHabit = (array) =>
+    array.reduce(
+      (lookup, log) => lookup.set(log.habitId, [...(lookup.get(log.habitId) || []), new Date(log.date).getDate()]),
+      new Map()
+    );
+  console.log('[Tracker] logs:', logs);
+
+  const logsByHabit = groupbyLogByHabit(logs);
+
   return (
     <Container fluid>
       <Table bordered responsive style={{ borderStyle: 'hidden' }}>
@@ -28,6 +37,7 @@ const Tracker = ({
             <th></th>
             {[...Array(31)].map((_, i) =>
               i < daysInMonth ? (
+                // If date is today, highlight cell
                 <th
                   className={
                     i + 1 === today.getDate() && month.getMonth() === today.getMonth()
@@ -38,6 +48,7 @@ const Tracker = ({
                   {i + 1}
                 </th>
               ) : (
+                // If date does not exist in month (e.g. Feb 31th), do not display date
                 <th className='text-center text-light'>{i + 1}</th>
               )
             )}
@@ -50,10 +61,22 @@ const Tracker = ({
               {[...Array(31)].map((_, i) => (
                 <td className='align-middle text-center' style={{ padding: 0, width: '3%' }}>
                   {i < daysInMonth && (
-                    <Button variant='outline-dark' size='sm' onClick={() => handleToggleCell(i + 1, habit.id)}>
+                    <Button
+                      variant='outline-dark'
+                      size='sm'
+                      onClick={() =>
+                        handleToggleCell(
+                          i + 1,
+                          habit.id,
+                          logsByHabit.get(habit.id) && logsByHabit.get(habit.id).includes(i + 1)
+                        )
+                      }
+                    >
                       <FontAwesomeIcon
                         icon={faCheck}
-                        className={logs.get(habit.id) && logs.get(habit.id).includes(i + 1) ? '' : 'text-light'}
+                        className={
+                          logsByHabit.get(habit.id) && logsByHabit.get(habit.id).includes(i + 1) ? '' : 'text-light'
+                        }
                       />
                     </Button>
                   )}
