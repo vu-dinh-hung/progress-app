@@ -1,9 +1,14 @@
 const mongoose = require('mongoose');
 
 const logSchema = new mongoose.Schema({
-  habitId: Number,
+  habitId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Habit',
+    required: true,
+  },
   date: {
     type: Date,
+    required: true,
   },
 });
 

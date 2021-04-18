@@ -1,18 +1,13 @@
 const router = require('express').Router();
+const Habit = require('../models/habit');
 
-let habits = [
-  { id: 1, name: 'code' },
-  { id: 2, name: 'run' },
-  { id: 3, name: 'morning pullup' },
-  { id: 4, name: 'sleep early' },
-];
-
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
+  const habits = await Habit.find({});
   res.json(habits);
 });
 
-router.get('/:id', (req, res) => {
-  const habit = habits.find((h) => h.id === Number(req.params.id));
+router.get('/:id', async (req, res) => {
+  const habit = await Habit.findById(req.params.id);
   if (habit) {
     res.json(habit);
   } else {
@@ -20,27 +15,25 @@ router.get('/:id', (req, res) => {
   }
 });
 
-router.post('/', (req, res) => {
-  const id = Math.max(...habits.map((h) => h.id)) + 1;
-  const newHabit = { id, name: req.body.name };
-  habits.push(newHabit);
-  res.status(201).json(newHabit);
+router.post('/', async (req, res) => {
+  const newHabit = new Habit({ name: req.body.name });
+  const savedHabit = await newHabit.save();
+  res.status(201).json(savedHabit);
 });
 
-router.put('/:id', (req, res) => {
-  const id = Number(req.params.id);
-  const habitToBeChanged = habits.find((h) => h.id === id);
+router.put('/:id', async (req, res) => {
+  const habitToBeChanged = await Habit.findById(req.params.id);
   if (habitToBeChanged) {
-    const newHabit = { id, name: req.body.name };
-    habits = habits.map((h) => (h.id === id ? newHabit : h));
-    res.json(newHabit);
+    const newHabit = { name: req.body.name };
+    const changedHabit = await Habit.findByIdAndUpdate(req.params.id, newHabit, { new: true });
+    res.json(changedHabit);
   } else {
     res.status(404).end();
   }
 });
 
-router.delete('/:id', (req, res) => {
-  habits = habits.filter((h) => h.id !== Number(req.params.id));
+router.delete('/:id', async (req, res) => {
+  await Habit.findByIdAndDelete(req.params.id);
   res.status(204).end();
 });
 

@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const Log = require('../models/log');
-const { startOfMonth, endOfMonth } = require('date-fns');
+const Habit = require('../models/habit');
+const { startOfMonth, endOfMonth, startOfDay, endOfDay } = require('date-fns');
 
 router.get('/', async (req, res) => {
   const yearmonth = req.query.yearmonth;
@@ -25,9 +26,21 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
+  const { habitId, date: datestr } = req.body;
+  // validation
+  if (datestr === undefined) return res.status(400).json({ error: 'no date specified' });
+  const habitExists = await Habit.exists({ _id: habitId });
+  if (!habitExists) return res.status(400).json({ error: 'nonexistent habit' });
+  const logExists = await Log.exists({
+    habitId,
+    date: { $gte: startOfDay(new Date(datestr)), $lte: endOfDay(new Date(datestr)) },
+  });
+  if (logExists) return res.status(400).json({ error: 'log already exists' });
+
+  // looks good, now create new log
   const newLog = new Log({
-    habitId: req.body.habitId,
-    date: new Date(req.body.date),
+    habitId,
+    date: new Date(datestr),
   });
   const savedLog = await newLog.save();
   res.status(201).json(savedLog);
