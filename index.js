@@ -6,6 +6,8 @@ const { MONGODB_URI, PORT } = require('./utils/config');
 const middleware = require('./utils/middleware');
 const logsRouter = require('./controllers/logs');
 const habitsRouter = require('./controllers/habits');
+const usersRouter = require('./controllers/users');
+const loginRouter = require('./controllers/login');
 
 const app = express();
 
@@ -27,6 +29,8 @@ app.use(morgan(':method :url :status [:response-time ms] - :body'));
 
 app.use('/api/logs', logsRouter);
 app.use('/api/habits', habitsRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/login', loginRouter);
 
 app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);

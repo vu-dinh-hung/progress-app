@@ -1,18 +1,19 @@
 const mongoose = require('mongoose');
 
-const habitSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+const userSchema = new mongoose.Schema({
+  username: {
+    type: String,
     required: true,
+    unique: true,
   },
-  name: {
+  name: String,
+  passwordHash: {
     type: String,
     required: true,
   },
 });
 
-habitSchema.set('toJSON', {
+userSchema.set('toJSON', {
   transform: (doc, ret) => {
     ret.id = ret._id;
     delete ret._id;
@@ -20,4 +21,4 @@ habitSchema.set('toJSON', {
   },
 });
 
-module.exports = mongoose.model('Habit', habitSchema);
+module.exports = mongoose.model('User', userSchema);

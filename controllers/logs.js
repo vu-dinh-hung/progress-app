@@ -53,8 +53,8 @@ router.put('/:id', async (req, res) => {
       habitId: req.body.habitId,
       date: req.body.date,
     };
-    const returnedLog = await Log.findByIdAndUpdate(req.params.id, newLog, { new: true });
-    res.json(returnedLog);
+    const changedLog = await Log.findByIdAndUpdate(req.params.id, newLog, { new: true });
+    res.json(changedLog);
   } else {
     res.status(404).end();
   }
