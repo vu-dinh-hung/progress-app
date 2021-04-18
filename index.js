@@ -1,13 +1,15 @@
 const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+require('express-async-errors');
 const { MONGODB_URI, PORT } = require('./utils/config');
+const middleware = require('./utils/middleware');
 const logsRouter = require('./controllers/logs');
 const habitsRouter = require('./controllers/habits');
 
 const app = express();
 
-//|connect to MongoDb Atlas|-----------------------------------
+//|connect to MongoDB Atlas|-----------------------------------
 mongoose
   .connect(MONGODB_URI, {
     useNewUrlParser: true,
@@ -25,6 +27,9 @@ app.use(morgan(':method :url :status [:response-time ms] - :body'));
 
 app.use('/api/logs', logsRouter);
 app.use('/api/habits', habitsRouter);
+
+app.use(middleware.unknownEndpoint);
+app.use(middleware.errorHandler);
 
 app.listen(PORT, () => {
   console.log(`server running on port ${PORT}`);
