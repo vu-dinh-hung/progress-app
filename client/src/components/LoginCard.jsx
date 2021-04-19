@@ -1,9 +1,9 @@
 import React from 'react';
 import { Popover, OverlayTrigger, Form, Button } from 'react-bootstrap';
 
-const LoginForm = ({ username, setUsername, password, setPassword, handleLogin }) => {
+const LoginCard = ({ username, setUsername, password, setPassword, handleLogin }) => {
   const popover = (
-    <Popover id='login-menu'>
+    <Popover id='login-card'>
       <Popover.Title as='h3'>Login</Popover.Title>
       <Popover.Content>
         <Form onSubmit={handleLogin}>
@@ -13,7 +13,7 @@ const LoginForm = ({ username, setUsername, password, setPassword, handleLogin }
               type='username'
               placeholder='Enter username'
               value={username}
-              autocomplete='off'
+              autoComplete='off'
               onChange={({ target }) => setUsername(target.value)}
             />
           </Form.Group>
@@ -23,7 +23,7 @@ const LoginForm = ({ username, setUsername, password, setPassword, handleLogin }
               type='password'
               placeholder='Password'
               value={password}
-              autocomplete='off'
+              autoComplete='off'
               onChange={({ target }) => setPassword(target.value)}
             />
           </Form.Group>
@@ -41,4 +41,4 @@ const LoginForm = ({ username, setUsername, password, setPassword, handleLogin }
   );
 };
 
-export default LoginForm;
+export default LoginCard;

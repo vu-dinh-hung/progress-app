@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { addMonths, subMonths } from 'date-fns';
 import { Tabs, Tab } from 'react-bootstrap';
 import './App.css';
 import Tracker from './components/Tracker';
 import Header from './components/Header';
+import logService from './services/logs';
+import habitService from './services/habits';
+import loginService from './services/login';
 
 const App = () => {
   const today = new Date();
@@ -13,40 +15,71 @@ const App = () => {
   const [logs, setLogs] = useState([]);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [user, setUser] = useState(null);
   const [showHabitForm, setShowHabitForm] = useState(false);
   const [newHabit, setNewHabit] = useState('');
 
   useEffect(() => {
-    axios.get('/api/habits').then((res) => {
-      setHabits(res.data);
+    const loggedUserJSON = window.localStorage.getItem('progressUser');
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON);
+      setUser(user);
+      console.log('--first', user);
+      logService.setToken(user.token);
+      habitService.setToken(user.token);
+    }
+  }, []);
+
+  useEffect(() => {
+    habitService.get().then((returnedHabits) => {
+      setHabits(returnedHabits);
     });
   }, []);
 
   useEffect(() => {
-    axios.get(`/api/logs?yearmonth=${'' + month.getFullYear() + month.getMonth()}`).then((res) => {
-      console.log(res.data);
-      setLogs(res.data);
+    logService.getByMonth(month).then((returnedLogs) => {
+      console.log(returnedLogs);
+      setLogs(returnedLogs);
     });
   }, [month]);
 
   const handleIncrementMonth = () => setMonth(addMonths(new Date(Date.UTC(month.getFullYear(), month.getMonth())), 1));
   const handleDecrementMonth = () => setMonth(subMonths(new Date(Date.UTC(month.getFullYear(), month.getMonth())), 1));
 
-  const handleLogin = (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault();
     console.log('logging in with credentials:', username, password);
+    try {
+      const user = await loginService.login({ username, password });
+      window.localStorage.setItem('progressUser', JSON.stringify(user)); // save to browser storage so user doesn't have to login every time they reload
+      setUser(user);
+      setUsername('');
+      setPassword('');
+    } catch (error) {
+      console.log(error);
+    }
     setUsername('');
     setPassword('');
+    window.location.reload(false);
+  };
+
+  const handleLogout = async (event) => {
+    window.localStorage.removeItem('progressUser');
+    setUser(null);
+    window.location.reload(false);
   };
 
   const handleClickShowHabitForm = () => setShowHabitForm(true);
-  const handleCancelShowHabitForm = () => setShowHabitForm(false);
+  const handleCancelShowHabitForm = () => {
+    setNewHabit('');
+    setShowHabitForm(false);
+  };
 
   const handleSubmitHabit = async (event) => {
     event.preventDefault();
     const habit = { id: habits.length + 1, name: newHabit };
-    const response = await axios.post('/api/habits/', habit);
-    setHabits(habits.concat(response.data));
+    const returnedHabit = await habitService.post(habit);
+    setHabits(habits.concat(returnedHabit));
     setNewHabit('');
     setShowHabitForm(false);
   };
@@ -58,7 +91,7 @@ const App = () => {
     if (cellIsChecked) {
       // update database
       const idToDelete = logs.find((log) => log.habitId === habitId && new Date(log.date).getDate() === cellDay).id;
-      axios.delete(`api/logs/${idToDelete}`);
+      await logService.deleteById(idToDelete);
       // update view
       newLogs = newLogs.filter((log) => !(log.habitId === habitId && new Date(log.date).getDate() === cellDay));
     } else {
@@ -67,9 +100,9 @@ const App = () => {
         habitId,
         date: new Date(Date.UTC(month.getFullYear(), month.getMonth(), cellDay)),
       };
-      const response = await axios.post('/api/logs', log);
+      const returnedLog = await logService.post(log);
       // update view
-      newLogs.push(response.data);
+      newLogs.push(returnedLog);
     }
 
     setLogs(newLogs);
@@ -83,9 +116,11 @@ const App = () => {
         onDecrementMonth={handleDecrementMonth}
         username={username}
         password={password}
+        user={user}
         setUsername={setUsername}
         setPassword={setPassword}
         handleLogin={handleLogin}
+        handleLogout={handleLogout}
       />
       <Tabs defaultActiveKey='tracker' id='tabs'>
         <Tab eventKey='tracker' title='Tracker' className=''>

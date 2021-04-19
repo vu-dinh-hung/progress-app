@@ -3,7 +3,8 @@ import { format } from 'date-fns';
 import { Container, Navbar, ButtonGroup, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
-import LoginForm from './LoginForm';
+import LoginCard from './LoginCard';
+import UserCard from './UserCard';
 
 const Header = ({
   month,
@@ -11,9 +12,11 @@ const Header = ({
   onDecrementMonth,
   username,
   password,
+  user,
   setUsername,
   setPassword,
   handleLogin,
+  handleLogout,
 }) => {
   return (
     <Navbar bg='light'>
@@ -27,13 +30,17 @@ const Header = ({
           </Button>
         </ButtonGroup>
         <span className='mr-auto'>{format(month, 'MMMM yyyy')}</span>
-        <LoginForm
-          username={username}
-          password={password}
-          setUsername={setUsername}
-          setPassword={setPassword}
-          handleLogin={handleLogin}
-        />
+        {user ? (
+          <UserCard user={user} handleLogout={handleLogout} />
+        ) : (
+          <LoginCard
+            username={username}
+            password={password}
+            setUsername={setUsername}
+            setPassword={setPassword}
+            handleLogin={handleLogin}
+          />
+        )}
       </Container>
     </Navbar>
   );

@@ -17,13 +17,13 @@ class HabitForm extends Component {
     return (
       <tr>
         <td className='align-middle text-center'>
-          <Form autocomplete={false} onSubmit={handleSubmitHabit}>
+          <Form onSubmit={handleSubmitHabit}>
             <Form.Group controlId='formHabit'>
               <Form.Control
                 as='input'
                 type='text'
-                placeholder='newhabit'
-                autocomplete='off'
+                placeholder=''
+                autoComplete='off'
                 value={newHabit}
                 onChange={({ target }) => setNewHabit(target.value)}
               />
@@ -33,7 +33,7 @@ class HabitForm extends Component {
             </Button>
           </Form>
         </td>
-        <td colspan='30' className='align-middle text-secondary'>
+        <td colSpan='30' className='align-middle text-secondary'>
           Type a new habit or click away to cancel
         </td>
       </tr>
