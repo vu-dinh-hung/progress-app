@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const cors = require('cors');
 require('express-async-errors');
 const { MONGODB_URI, PORT } = require('./utils/config');
 const middleware = require('./utils/middleware');
@@ -23,6 +24,8 @@ mongoose
   .catch((error) => console.log('error connecting to MongoDB:', error));
 //-------------------------------------------------------------
 
+app.use(cors());
+app.use(express.static('build'));
 app.use(express.json()); // for getting the request body
 morgan.token('body', (req) => JSON.stringify(req.body));
 app.use(morgan(':method :url :status [:response-time ms] - :body'));
