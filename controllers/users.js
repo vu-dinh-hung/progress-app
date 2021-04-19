@@ -18,6 +18,7 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   const { username, name, password } = req.body;
+  if (await User.exists({ username })) return res.status(400).json({ error: 'username already exists' });
   const rounds = 11;
   const passwordHash = await bcrypt.hash(password, rounds);
 
