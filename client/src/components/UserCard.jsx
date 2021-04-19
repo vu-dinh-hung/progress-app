@@ -15,7 +15,7 @@ const UserCard = ({ user, handleLogout }) => {
 
   return (
     <OverlayTrigger trigger='click' rootClose placement='bottom' overlay={popover}>
-      <Button variant='outline-primary'>{user.name}</Button>
+      <Button variant='outline-primary'>{user.name ? user.name : user.username}</Button>
     </OverlayTrigger>
   );
 };

@@ -4,6 +4,7 @@ import { Container, Navbar, ButtonGroup, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import LoginCard from './LoginCard';
+import RegisterCard from './RegisterCard';
 import UserCard from './UserCard';
 
 const Header = ({
@@ -13,6 +14,7 @@ const Header = ({
   username,
   password,
   user,
+  setUser,
   setUsername,
   setPassword,
   handleLogin,
@@ -33,13 +35,17 @@ const Header = ({
         {user ? (
           <UserCard user={user} handleLogout={handleLogout} />
         ) : (
-          <LoginCard
-            username={username}
-            password={password}
-            setUsername={setUsername}
-            setPassword={setPassword}
-            handleLogin={handleLogin}
-          />
+          <>
+            <RegisterCard setUser={setUser} />
+            <span className='mx-1' />
+            <LoginCard
+              username={username}
+              password={password}
+              setUsername={setUsername}
+              setPassword={setPassword}
+              handleLogin={handleLogin}
+            />
+          </>
         )}
       </Container>
     </Navbar>

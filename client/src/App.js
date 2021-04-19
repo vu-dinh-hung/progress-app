@@ -48,7 +48,6 @@ const App = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault();
-    console.log('logging in with credentials:', username, password);
     try {
       const user = await loginService.login({ username, password });
       window.localStorage.setItem('progressUser', JSON.stringify(user)); // save to browser storage so user doesn't have to login every time they reload
@@ -64,8 +63,25 @@ const App = () => {
   };
 
   const handleLogout = async (event) => {
+    event.preventDefault();
     window.localStorage.removeItem('progressUser');
     setUser(null);
+    window.location.reload(false);
+  };
+
+  const handleRegister = async (event) => {
+    event.preventDefault();
+    try {
+      const user = await loginService.register({ username, password });
+      window.localStorage.setItem('progressUser', JSON.stringify(user)); // save to browser storage so user doesn't have to login every time they reload
+      setUser(user);
+      setUsername('');
+      setPassword('');
+    } catch (error) {
+      console.log(error);
+    }
+    setUsername('');
+    setPassword('');
     window.location.reload(false);
   };
 
@@ -117,10 +133,12 @@ const App = () => {
         username={username}
         password={password}
         user={user}
+        setUser={setUser}
         setUsername={setUsername}
         setPassword={setPassword}
         handleLogin={handleLogin}
         handleLogout={handleLogout}
+        handleRegister={handleRegister}
       />
       <Tabs defaultActiveKey='tracker' id='tabs'>
         <Tab eventKey='tracker' title='Tracker' className=''>
