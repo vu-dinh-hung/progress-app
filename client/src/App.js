@@ -86,21 +86,6 @@ const App = () => {
     displayMessage('Logged out');
   };
 
-  const handleRegister = async (event) => {
-    event.preventDefault();
-    try {
-      const user = await loginService.register({ username, password });
-      window.localStorage.setItem('progressUser', JSON.stringify(user)); // save to browser storage so user doesn't have to login every time they reload
-      setUser(user);
-      displayMessage('User registered. Logged in as ' + user.username);
-    } catch (error) {
-      console.log(error);
-      displayMessage('Error: Missing field(s)');
-    }
-    setUsername('');
-    setPassword('');
-  };
-
   const handleClickShowHabitForm = () => setShowHabitForm(true);
   const handleCancelShowHabitForm = () => {
     setNewHabit('');
@@ -150,7 +135,7 @@ const App = () => {
         setPassword={setPassword}
         handleLogin={handleLogin}
         handleLogout={handleLogout}
-        handleRegister={handleRegister}
+        displayMessage={displayMessage}
       />
       {message && <MessageBanner message={message} />}
       <Tabs defaultActiveKey='tracker' id='tabs'>

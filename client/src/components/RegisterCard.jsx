@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Popover, OverlayTrigger, Form, Button } from 'react-bootstrap';
 import loginService from '../services/login';
 
-const RegisterCard = ({ setUser }) => {
+const RegisterCard = ({ setUser, displayMessage }) => {
   const [newUsername, setNewUsername] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [newName, setNewName] = useState('');
@@ -10,19 +10,22 @@ const RegisterCard = ({ setUser }) => {
   const handleRegister = async (event) => {
     event.preventDefault();
     try {
-      const user = await loginService.register({ username: newUsername, password: newPassword, name: newName });
+      const user = await loginService.register({ username: newUsername, password: newPassword });
       window.localStorage.setItem('progressUser', JSON.stringify(user)); // save to browser storage so user doesn't have to login every time they reload
       setUser(user);
-      setNewUsername('');
-      setNewPassword('');
-      setNewName('');
+      displayMessage('User registered. Logged in as ' + user.username);
     } catch (error) {
-      console.log(error);
+      if (error.response.data.error) {
+        displayMessage('Error: ' + error.response.data.error);
+      } else {
+        displayMessage('' + error);
+      }
     }
     setNewUsername('');
     setNewPassword('');
-    window.location.reload(false);
   };
+
+  const asterisk = () => <span style={{ color: 'red' }}>*</span>;
 
   const popover = (
     <Popover id='register-card'>
@@ -30,23 +33,25 @@ const RegisterCard = ({ setUser }) => {
       <Popover.Content>
         <Form onSubmit={handleRegister}>
           <Form.Group controlId='formGroupUsername'>
-            <Form.Label>Username</Form.Label>
+            <Form.Label>Username{asterisk()}</Form.Label>
             <Form.Control
               type='username'
               placeholder='Enter username'
               value={newUsername}
               autoComplete='off'
               onChange={({ target }) => setNewUsername(target.value)}
+              required
             />
           </Form.Group>
           <Form.Group controlId='formGroupPassword'>
-            <Form.Label>Password</Form.Label>
+            <Form.Label>Password{asterisk()}</Form.Label>
             <Form.Control
               type='password'
               placeholder='Password'
               value={newPassword}
               autoComplete='off'
               onChange={({ target }) => setNewPassword(target.value)}
+              required
             />
           </Form.Group>
           <Form.Group controlId='formGroupName'>

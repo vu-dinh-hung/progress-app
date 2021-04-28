@@ -19,6 +19,7 @@ const Header = ({
   setPassword,
   handleLogin,
   handleLogout,
+  displayMessage,
 }) => {
   return (
     <Navbar bg='light'>
@@ -36,7 +37,7 @@ const Header = ({
           <UserCard user={user} handleLogout={handleLogout} />
         ) : (
           <>
-            <RegisterCard setUser={setUser} />
+            <RegisterCard setUser={setUser} displayMessage={displayMessage} />
             <span className='mx-1' />
             <LoginCard
               username={username}
