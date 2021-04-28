@@ -118,6 +118,12 @@ const App = () => {
     setLogs(newLogs);
   };
 
+  const handleRemoveHabit = async (habitId) => {
+    console.log('removing', habitId);
+    await habitService.deleteById(habitId);
+    setHabits(habits.filter((habit) => !(habit.id === habitId)));
+  };
+
   return (
     <div>
       <Header
@@ -148,6 +154,7 @@ const App = () => {
             newHabit={newHabit}
             setNewHabit={setNewHabit}
             showHabitForm={showHabitForm}
+            handleRemoveHabit={handleRemoveHabit}
           />
         </Tab>
         <Tab eventKey='stats' title='Stats'>

@@ -2,7 +2,7 @@ import React from 'react';
 import { getDaysInMonth } from 'date-fns';
 import { Container, Table, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faCheck, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import HabitForm from './HabitForm';
 
 const Tracker = ({
@@ -16,6 +16,7 @@ const Tracker = ({
   newHabit,
   setNewHabit,
   showHabitForm,
+  handleRemoveHabit,
 }) => {
   const daysInMonth = getDaysInMonth(month);
 
@@ -56,7 +57,12 @@ const Tracker = ({
         <tbody>
           {habits.map((habit) => (
             <tr>
-              <td className='align-middle'>{habit.name}</td>
+              <td>
+                <Button variant='sm' onClick={() => handleRemoveHabit(habit.id)}>
+                  <FontAwesomeIcon icon={faTimesCircle} />
+                </Button>
+                {habit.name}
+              </td>
               {[...Array(31)].map((_, i) => (
                 <td className='align-middle text-center' style={{ padding: 0, width: '3%' }}>
                   {i < daysInMonth && (
