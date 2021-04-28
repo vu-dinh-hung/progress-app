@@ -19,6 +19,7 @@ const App = () => {
   const [showHabitForm, setShowHabitForm] = useState(false);
   const [newHabit, setNewHabit] = useState('');
 
+  // Initial user login
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('progressUser');
     if (loggedUserJSON) {
@@ -31,17 +32,27 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    habitService.get().then((returnedHabits) => {
-      setHabits(returnedHabits);
-    });
-  }, []);
-
-  useEffect(() => {
     logService.getByMonth(month).then((returnedLogs) => {
-      console.log(returnedLogs);
       setLogs(returnedLogs);
     });
   }, [month]);
+
+  // Update Tracker interface every time user logs in/out
+  useEffect(() => {
+    if (user) {
+      logService.setToken(user.token);
+      habitService.setToken(user.token);
+      habitService.get().then((returnedHabits) => {
+        setHabits(returnedHabits);
+      });
+      logService.getByMonth(month).then((returnedLogs) => {
+        setLogs(returnedLogs);
+      });
+    } else {
+      setHabits([]);
+      setLogs([]);
+    }
+  }, [user]);
 
   const handleIncrementMonth = () => setMonth(addMonths(new Date(Date.UTC(month.getFullYear(), month.getMonth())), 1));
   const handleDecrementMonth = () => setMonth(subMonths(new Date(Date.UTC(month.getFullYear(), month.getMonth())), 1));
@@ -59,14 +70,12 @@ const App = () => {
     }
     setUsername('');
     setPassword('');
-    window.location.reload(false);
   };
 
   const handleLogout = async (event) => {
     event.preventDefault();
     window.localStorage.removeItem('progressUser');
     setUser(null);
-    window.location.reload(false);
   };
 
   const handleRegister = async (event) => {
@@ -82,7 +91,6 @@ const App = () => {
     }
     setUsername('');
     setPassword('');
-    window.location.reload(false);
   };
 
   const handleClickShowHabitForm = () => setShowHabitForm(true);
