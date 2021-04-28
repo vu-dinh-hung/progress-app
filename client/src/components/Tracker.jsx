@@ -6,7 +6,6 @@ import { faPlus, faCheck } from '@fortawesome/free-solid-svg-icons';
 import HabitForm from './HabitForm';
 
 const Tracker = ({
-  today,
   month,
   habits,
   logs,
@@ -40,7 +39,7 @@ const Tracker = ({
                 // If date is today, highlight cell
                 <th
                   className={
-                    i + 1 === today.getDate() && month.getMonth() === today.getMonth()
+                    i + 1 === new Date().getDate() && month.getMonth() === new Date().getMonth()
                       ? 'text-center border-dark border-right-0'
                       : 'text-center'
                   }

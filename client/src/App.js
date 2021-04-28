@@ -10,8 +10,7 @@ import habitService from './services/habits';
 import loginService from './services/login';
 
 const App = () => {
-  const today = new Date();
-  const [month, setMonth] = useState(new Date(Date.UTC(today.getFullYear(), today.getMonth())));
+  const [month, setMonth] = useState(new Date(Date.UTC(new Date().getFullYear(), new Date().getMonth())));
   const [habits, setHabits] = useState([]);
   const [logs, setLogs] = useState([]);
   const [username, setUsername] = useState('');
@@ -47,9 +46,7 @@ const App = () => {
       habitService.get().then((returnedHabits) => {
         setHabits(returnedHabits);
       });
-      logService.getByMonth(month).then((returnedLogs) => {
-        setLogs(returnedLogs);
-      });
+      setMonth(new Date(Date.UTC(new Date().getFullYear(), new Date().getMonth())));
     } else {
       setHabits([]);
       setLogs([]);
@@ -141,7 +138,6 @@ const App = () => {
       <Tabs defaultActiveKey='tracker' id='tabs'>
         <Tab eventKey='tracker' title='Tracker' className=''>
           <Tracker
-            today={today}
             month={month}
             habits={habits}
             logs={logs}
