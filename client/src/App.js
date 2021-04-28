@@ -101,21 +101,18 @@ const App = () => {
   const handleToggleCell = async (cellDay, habitId, cellIsChecked) => {
     console.log('----------------clicked cell', habitId, cellDay);
 
-    let newLogs = [...logs];
     if (cellIsChecked) {
       const idToDelete = logs.find((log) => log.habitId === habitId && new Date(log.date).getDate() === cellDay).id;
       await logService.deleteById(idToDelete);
-      newLogs = newLogs.filter((log) => !(log.habitId === habitId && new Date(log.date).getDate() === cellDay));
+      setLogs(logs.filter((log) => !(log.habitId === habitId && new Date(log.date).getDate() === cellDay)));
     } else {
       const log = {
         habitId,
         date: new Date(Date.UTC(month.getFullYear(), month.getMonth(), cellDay)),
       };
       const returnedLog = await logService.post(log);
-      newLogs.push(returnedLog);
+      setLogs(logs.concat(returnedLog));
     }
-
-    setLogs(newLogs);
   };
 
   const handleRemoveHabit = async (habitId) => {
