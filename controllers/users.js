@@ -20,7 +20,14 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   const { username, name, password } = req.body;
-  if (await User.exists({ username })) return res.status(400).json({ error: 'username already exists' });
+  // Validate
+  if (!username) return res.status(400).json({ error: 'Missing username' });
+  if (password === undefined || password.length < 8)
+    return res.status(400).json({ error: 'Password too short. Please use at least 8 characters' });
+  if (await User.exists({ username }))
+    return res.status(400).json({ error: 'Username already exists. Please pick a different one' });
+
+  // Create user
   const rounds = 11;
   const passwordHash = await bcrypt.hash(password, rounds);
 
