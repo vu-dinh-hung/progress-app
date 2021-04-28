@@ -4,6 +4,7 @@ import { Tabs, Tab } from 'react-bootstrap';
 import './App.css';
 import Tracker from './components/Tracker';
 import Header from './components/Header';
+import MessageBanner from './components/MessageBanner';
 import logService from './services/logs';
 import habitService from './services/habits';
 import loginService from './services/login';
@@ -18,6 +19,7 @@ const App = () => {
   const [user, setUser] = useState(null);
   const [showHabitForm, setShowHabitForm] = useState(false);
   const [newHabit, setNewHabit] = useState('');
+  const [message, setMessage] = useState('');
 
   // Initial user login
   useEffect(() => {
@@ -54,6 +56,11 @@ const App = () => {
     }
   }, [user]);
 
+  const displayMessage = (message, duration = 5000) => {
+    setMessage(message);
+    setTimeout(() => setMessage(''), duration);
+  };
+
   const handleIncrementMonth = () => setMonth(addMonths(new Date(Date.UTC(month.getFullYear(), month.getMonth())), 1));
   const handleDecrementMonth = () => setMonth(subMonths(new Date(Date.UTC(month.getFullYear(), month.getMonth())), 1));
 
@@ -63,10 +70,10 @@ const App = () => {
       const user = await loginService.login({ username, password });
       window.localStorage.setItem('progressUser', JSON.stringify(user)); // save to browser storage so user doesn't have to login every time they reload
       setUser(user);
-      setUsername('');
-      setPassword('');
+      displayMessage('Logged in as ' + user.username);
     } catch (error) {
       console.log(error);
+      displayMessage("Error: Wrong credentials. If you don't have an account yet, please register");
     }
     setUsername('');
     setPassword('');
@@ -76,6 +83,7 @@ const App = () => {
     event.preventDefault();
     window.localStorage.removeItem('progressUser');
     setUser(null);
+    displayMessage('Logged out');
   };
 
   const handleRegister = async (event) => {
@@ -84,10 +92,10 @@ const App = () => {
       const user = await loginService.register({ username, password });
       window.localStorage.setItem('progressUser', JSON.stringify(user)); // save to browser storage so user doesn't have to login every time they reload
       setUser(user);
-      setUsername('');
-      setPassword('');
+      displayMessage('User registered. Logged in as ' + user.username);
     } catch (error) {
       console.log(error);
+      displayMessage('Error: Missing field(s)');
     }
     setUsername('');
     setPassword('');
@@ -113,19 +121,15 @@ const App = () => {
 
     let newLogs = [...logs];
     if (cellIsChecked) {
-      // update database
       const idToDelete = logs.find((log) => log.habitId === habitId && new Date(log.date).getDate() === cellDay).id;
       await logService.deleteById(idToDelete);
-      // update view
       newLogs = newLogs.filter((log) => !(log.habitId === habitId && new Date(log.date).getDate() === cellDay));
     } else {
-      // update database
       const log = {
         habitId,
         date: new Date(Date.UTC(month.getFullYear(), month.getMonth(), cellDay)),
       };
       const returnedLog = await logService.post(log);
-      // update view
       newLogs.push(returnedLog);
     }
 
@@ -148,6 +152,7 @@ const App = () => {
         handleLogout={handleLogout}
         handleRegister={handleRegister}
       />
+      {message && <MessageBanner message={message} />}
       <Tabs defaultActiveKey='tracker' id='tabs'>
         <Tab eventKey='tracker' title='Tracker' className=''>
           <Tracker
