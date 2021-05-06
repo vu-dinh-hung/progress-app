@@ -62,6 +62,15 @@ const App = () => {
     }
   }, [user]);
 
+  // Show habit input form if the list of habits is empty
+  useEffect(() => {
+    if (habits.length > 0) {
+      setShowHabitForm(false);
+    } else {
+      setShowHabitForm(true);
+    }
+  }, [habits]);
+
   const displayMessage = (message, duration = 5000) => {
     setMessage(message);
     setTimeout(() => setMessage(''), duration);
