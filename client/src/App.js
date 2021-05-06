@@ -112,13 +112,13 @@ const App = () => {
   const handleSubmitHabit = async (event) => {
     event.preventDefault();
     let habit = { id: habits.length + 1, name: newHabit };
+    setNewHabit('');
+    setShowHabitForm(false);
     if (user) {
       // if logged in, send request to server, else only change interface for guest mode
       habit = await habitService.post(habit);
     }
     setHabits(habits.concat(habit));
-    setNewHabit('');
-    setShowHabitForm(false);
   };
 
   const handleToggleCell = async (cellDay, habitId, cellIsChecked) => {
@@ -126,11 +126,11 @@ const App = () => {
 
     if (cellIsChecked) {
       const idToDelete = logs.find((log) => log.habitId === habitId && new Date(log.date).getDate() === cellDay).id;
+      setLogs(logs.filter((log) => !(log.habitId === habitId && new Date(log.date).getDate() === cellDay)));
       if (user) {
         // if logged in, send request to server, else only change interface for guest mode
         await logService.deleteById(idToDelete);
       }
-      setLogs(logs.filter((log) => !(log.habitId === habitId && new Date(log.date).getDate() === cellDay)));
     } else {
       let log = {
         habitId,
@@ -146,12 +146,12 @@ const App = () => {
 
   const handleDeleteHabit = async (habitId) => {
     console.log('removing', habitId);
+    setHabitIdToDelete(null);
+    setHabits(habits.filter((habit) => !(habit.id === habitId)));
     if (user) {
       // if logged in, send request to server, else only change interface for guest mode
       await habitService.deleteById(habitId);
     }
-    setHabitIdToDelete(null);
-    setHabits(habits.filter((habit) => !(habit.id === habitId)));
   };
 
   const handleCancelDeleteHabit = () => {
