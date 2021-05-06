@@ -5,6 +5,7 @@ import './App.css';
 import Tracker from './components/Tracker';
 import Header from './components/Header';
 import MessageBanner from './components/MessageBanner';
+import HabitDeleteModal from './components/HabitDeleteModal';
 import logService from './services/logs';
 import habitService from './services/habits';
 import loginService from './services/login';
@@ -19,6 +20,7 @@ const App = () => {
   const [showHabitForm, setShowHabitForm] = useState(false);
   const [newHabit, setNewHabit] = useState('');
   const [message, setMessage] = useState('');
+  const [habitIdToDelete, setHabitIdToDelete] = useState(null);
 
   const loginMessage =
     'You are in guest mode. Any change will be lost upon reloading. To start using the app, please register.';
@@ -142,13 +144,19 @@ const App = () => {
     }
   };
 
-  const handleRemoveHabit = async (habitId) => {
+  const handleDeleteHabit = async (habitId) => {
     console.log('removing', habitId);
     if (user) {
       // if logged in, send request to server, else only change interface for guest mode
       await habitService.deleteById(habitId);
     }
+    setHabitIdToDelete(null);
     setHabits(habits.filter((habit) => !(habit.id === habitId)));
+  };
+
+  const handleCancelDeleteHabit = () => {
+    console.log('cancelling delete habit');
+    setHabitIdToDelete(null);
   };
 
   return (
@@ -167,7 +175,16 @@ const App = () => {
         handleLogout={handleLogout}
         displayMessage={displayMessage}
       />
+
       {message && <MessageBanner message={message} />}
+
+      <HabitDeleteModal
+        habits={habits}
+        habitIdToDelete={habitIdToDelete}
+        handleDeleteHabit={handleDeleteHabit}
+        handleCancelDeleteHabit={handleCancelDeleteHabit}
+      />
+
       <Tabs defaultActiveKey='tracker' id='tabs'>
         <Tab eventKey='tracker' title='Tracker' className=''>
           <Tracker
@@ -181,7 +198,7 @@ const App = () => {
             newHabit={newHabit}
             setNewHabit={setNewHabit}
             showHabitForm={showHabitForm}
-            handleRemoveHabit={handleRemoveHabit}
+            setHabitIdToDelete={setHabitIdToDelete}
           />
         </Tab>
         <Tab eventKey='stats' title='Stats'>

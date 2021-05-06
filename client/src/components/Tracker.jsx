@@ -16,7 +16,7 @@ const Tracker = ({
   newHabit,
   setNewHabit,
   showHabitForm,
-  handleRemoveHabit,
+  setHabitIdToDelete,
 }) => {
   const daysInMonth = getDaysInMonth(month);
 
@@ -58,7 +58,7 @@ const Tracker = ({
           {habits.map((habit) => (
             <tr>
               <td>
-                <Button variant='sm' onClick={() => handleRemoveHabit(habit.id)}>
+                <Button variant='sm' onClick={() => setHabitIdToDelete(habit.id)}>
                   <FontAwesomeIcon icon={faTimesCircle} />
                 </Button>
                 {habit.name}
