@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const Habit = require('../models/habit');
+const Log = require('../models/log');
 const auth = require('../utils/auth');
 
 router.get('/', async (req, res) => {
@@ -51,6 +52,7 @@ router.delete('/:id', async (req, res) => {
   if (!decodedToken) return res.status(401).json({ error: 'invalid token' });
 
   await Habit.deleteOne({ _id: req.params.id, userId: decodedToken.id });
+  await Log.deleteMany({ habitId: req.params.id, userId: decodedToken.id });
   res.status(204).end();
 });
 
