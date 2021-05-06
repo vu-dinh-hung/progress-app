@@ -20,6 +20,9 @@ const App = () => {
   const [newHabit, setNewHabit] = useState('');
   const [message, setMessage] = useState('');
 
+  const loginMessage =
+    'You are in guest mode. Any change will be lost upon reloading. To start using the app, please register.';
+
   // Initial user login
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('progressUser');
@@ -41,6 +44,9 @@ const App = () => {
   // Update Tracker interface every time user logs in/out
   useEffect(() => {
     if (user) {
+      if (message === loginMessage) {
+        setMessage('');
+      }
       logService.setToken(user.token);
       habitService.setToken(user.token);
       habitService.get().then((returnedHabits) => {
@@ -48,6 +54,9 @@ const App = () => {
       });
       setMonth(new Date(Date.UTC(new Date().getFullYear(), new Date().getMonth())));
     } else {
+      if (!message) {
+        setMessage(loginMessage);
+      }
       setHabits([]);
       setLogs([]);
     }
@@ -91,9 +100,12 @@ const App = () => {
 
   const handleSubmitHabit = async (event) => {
     event.preventDefault();
-    const habit = { id: habits.length + 1, name: newHabit };
-    const returnedHabit = await habitService.post(habit);
-    setHabits(habits.concat(returnedHabit));
+    let habit = { id: habits.length + 1, name: newHabit };
+    if (user) {
+      // if logged in, send request to server, else only change interface for guest mode
+      habit = await habitService.post(habit);
+    }
+    setHabits(habits.concat(habit));
     setNewHabit('');
     setShowHabitForm(false);
   };
@@ -103,21 +115,30 @@ const App = () => {
 
     if (cellIsChecked) {
       const idToDelete = logs.find((log) => log.habitId === habitId && new Date(log.date).getDate() === cellDay).id;
-      await logService.deleteById(idToDelete);
+      if (user) {
+        // if logged in, send request to server, else only change interface for guest mode
+        await logService.deleteById(idToDelete);
+      }
       setLogs(logs.filter((log) => !(log.habitId === habitId && new Date(log.date).getDate() === cellDay)));
     } else {
-      const log = {
+      let log = {
         habitId,
         date: new Date(Date.UTC(month.getFullYear(), month.getMonth(), cellDay)),
       };
-      const returnedLog = await logService.post(log);
-      setLogs(logs.concat(returnedLog));
+      if (user) {
+        // if logged in, send request to server, else only change interface for guest mode
+        log = await logService.post(log);
+      }
+      setLogs(logs.concat(log));
     }
   };
 
   const handleRemoveHabit = async (habitId) => {
     console.log('removing', habitId);
-    await habitService.deleteById(habitId);
+    if (user) {
+      // if logged in, send request to server, else only change interface for guest mode
+      await habitService.deleteById(habitId);
+    }
     setHabits(habits.filter((habit) => !(habit.id === habitId)));
   };
 
