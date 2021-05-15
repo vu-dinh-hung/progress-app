@@ -14,11 +14,8 @@ const App = () => {
   const [month, setMonth] = useState(new Date(Date.UTC(new Date().getFullYear(), new Date().getMonth())));
   const [habits, setHabits] = useState([]);
   const [logs, setLogs] = useState([]);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
   const [showHabitForm, setShowHabitForm] = useState(false);
-  const [newHabit, setNewHabit] = useState('');
   const [message, setMessage] = useState('');
   const [habitIdToDelete, setHabitIdToDelete] = useState(null);
 
@@ -78,11 +75,25 @@ const App = () => {
     setTimeout(() => setMessage(''), duration);
   };
 
-  const handleIncrementMonth = () => setMonth(addMonths(new Date(Date.UTC(month.getFullYear(), month.getMonth())), 1));
-  const handleDecrementMonth = () => setMonth(subMonths(new Date(Date.UTC(month.getFullYear(), month.getMonth())), 1));
+  const incrementMonth = () => setMonth(addMonths(new Date(Date.UTC(month.getFullYear(), month.getMonth())), 1));
+  const decrementMonth = () => setMonth(subMonths(new Date(Date.UTC(month.getFullYear(), month.getMonth())), 1));
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
+  const handleRegister = async ({ username, password }) => {
+    try {
+      const user = await loginService.register({ username, password });
+      window.localStorage.setItem('progressUser', JSON.stringify(user)); // save to browser storage so user doesn't have to login every time they reload
+      setUser(user);
+      displayMessage('User registered. Logged in as ' + user.username);
+    } catch (error) {
+      if (error.response.data.error) {
+        displayMessage('Error: ' + error.response.data.error);
+      } else {
+        displayMessage('' + error);
+      }
+    }
+  };
+
+  const handleLogin = async ({ username, password }) => {
     try {
       const user = await loginService.login({ username, password });
       window.localStorage.setItem('progressUser', JSON.stringify(user)); // save to browser storage so user doesn't have to login every time they reload
@@ -92,8 +103,6 @@ const App = () => {
       console.log(error);
       displayMessage("Error: Wrong credentials. If you don't have an account yet, please register");
     }
-    setUsername('');
-    setPassword('');
   };
 
   const handleLogout = async (event) => {
@@ -103,17 +112,8 @@ const App = () => {
     displayMessage('Logged out');
   };
 
-  const handleClickShowHabitForm = () => setShowHabitForm(true);
-  const handleCancelShowHabitForm = () => {
-    setNewHabit('');
-    setShowHabitForm(false);
-  };
-
-  const handleSubmitHabit = async (event) => {
-    event.preventDefault();
+  const handleSubmitHabit = async ({ newHabit }) => {
     let habit = { id: habits.length + 1, name: newHabit };
-    setNewHabit('');
-    setShowHabitForm(false);
     if (user) {
       // if logged in, send request to server, else only change interface for guest mode
       habit = await habitService.post(habit);
@@ -163,17 +163,12 @@ const App = () => {
     <div>
       <Header
         month={month}
-        onIncrementMonth={handleIncrementMonth}
-        onDecrementMonth={handleDecrementMonth}
-        username={username}
-        password={password}
+        incrementMonth={incrementMonth}
+        decrementMonth={decrementMonth}
         user={user}
-        setUser={setUser}
-        setUsername={setUsername}
-        setPassword={setPassword}
+        handleRegister={handleRegister}
         handleLogin={handleLogin}
         handleLogout={handleLogout}
-        displayMessage={displayMessage}
       />
 
       {message && <MessageBanner message={message} />}
@@ -192,11 +187,8 @@ const App = () => {
             habits={habits}
             logs={logs}
             handleToggleCell={handleToggleCell}
-            handleClickShowHabitForm={handleClickShowHabitForm}
-            handleCancelShowHabitForm={handleCancelShowHabitForm}
+            setShowHabitForm={setShowHabitForm}
             handleSubmitHabit={handleSubmitHabit}
-            newHabit={newHabit}
-            setNewHabit={setNewHabit}
             showHabitForm={showHabitForm}
             setHabitIdToDelete={setHabitIdToDelete}
           />

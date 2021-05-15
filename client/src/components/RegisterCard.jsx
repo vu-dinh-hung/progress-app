@@ -1,26 +1,14 @@
 import React, { useState } from 'react';
 import { Popover, OverlayTrigger, Form, Button } from 'react-bootstrap';
-import loginService from '../services/login';
 
-const RegisterCard = ({ setUser, displayMessage }) => {
+const RegisterCard = ({ handleRegister }) => {
   const [newUsername, setNewUsername] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [newName, setNewName] = useState('');
 
-  const handleRegister = async (event) => {
+  const handleClickRegister = async (event) => {
     event.preventDefault();
-    try {
-      const user = await loginService.register({ username: newUsername, password: newPassword });
-      window.localStorage.setItem('progressUser', JSON.stringify(user)); // save to browser storage so user doesn't have to login every time they reload
-      setUser(user);
-      displayMessage('User registered. Logged in as ' + user.username);
-    } catch (error) {
-      if (error.response.data.error) {
-        displayMessage('Error: ' + error.response.data.error);
-      } else {
-        displayMessage('' + error);
-      }
-    }
+    await handleRegister({ username: newUsername, password: newPassword });
     setNewUsername('');
     setNewPassword('');
   };
@@ -31,7 +19,7 @@ const RegisterCard = ({ setUser, displayMessage }) => {
     <Popover id='register-card'>
       <Popover.Title as='h3'>Register</Popover.Title>
       <Popover.Content>
-        <Form onSubmit={handleRegister}>
+        <Form onSubmit={handleClickRegister}>
           <Form.Group controlId='formGroupUsername'>
             <Form.Label>Username{asterisk()}</Form.Label>
             <Form.Control

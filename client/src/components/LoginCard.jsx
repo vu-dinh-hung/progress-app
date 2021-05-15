@@ -1,12 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Popover, OverlayTrigger, Form, Button } from 'react-bootstrap';
 
-const LoginCard = ({ username, setUsername, password, setPassword, handleLogin }) => {
+const LoginCard = ({ handleLogin }) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleClickLogin = async (event) => {
+    event.preventDefault();
+    await handleLogin({ username, password });
+    setUsername('');
+    setPassword('');
+  };
+
   const popover = (
     <Popover id='login-card'>
       <Popover.Title as='h3'>Login</Popover.Title>
       <Popover.Content>
-        <Form onSubmit={handleLogin}>
+        <Form onSubmit={handleClickLogin}>
           <Form.Group controlId='formGroupUsername'>
             <Form.Label>Username</Form.Label>
             <Form.Control

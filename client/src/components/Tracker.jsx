@@ -2,7 +2,7 @@ import React from 'react';
 import { getDaysInMonth } from 'date-fns';
 import { Container, Table, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faCheck, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import HabitForm from './HabitForm';
 
 const Tracker = ({
@@ -10,11 +10,8 @@ const Tracker = ({
   habits,
   logs,
   handleToggleCell,
-  handleClickShowHabitForm,
-  handleCancelShowHabitForm,
+  setShowHabitForm,
   handleSubmitHabit,
-  newHabit,
-  setNewHabit,
   showHabitForm,
   setHabitIdToDelete,
 }) => {
@@ -89,19 +86,13 @@ const Tracker = ({
               ))}
             </tr>
           ))}
-          {showHabitForm && (
-            <HabitForm
-              handleCancelShowHabitForm={handleCancelShowHabitForm}
-              handleSubmitHabit={handleSubmitHabit}
-              newHabit={newHabit}
-              setNewHabit={setNewHabit}
-            />
-          )}
+          <HabitForm
+            showHabitForm={showHabitForm}
+            setShowHabitForm={setShowHabitForm}
+            handleSubmitHabit={handleSubmitHabit}
+          />
         </tbody>
       </Table>
-      <Button variant='outline-secondary' size='sm' block onClick={handleClickShowHabitForm}>
-        <FontAwesomeIcon icon={faPlus} />
-      </Button>
     </Container>
   );
 };
