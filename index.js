@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('express-async-errors');
 const { MONGODB_URI, PORT } = require('./utils/config');
+const logger = require('./utils/logger');
 const middleware = require('./utils/middleware');
 const logsRouter = require('./controllers/logs');
 const habitsRouter = require('./controllers/habits');
@@ -20,8 +21,8 @@ mongoose
     useFindAndModify: false,
     useCreateIndex: true,
   })
-  .then(() => console.log('connected to MongoDB'))
-  .catch((error) => console.log('error connecting to MongoDB:', error));
+  .then(() => logger.info('connected to MongoDB'))
+  .catch((error) => logger.error('error connecting to MongoDB:', error));
 //-------------------------------------------------------------
 
 app.use(cors());
@@ -39,5 +40,5 @@ app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
 
 app.listen(PORT, () => {
-  console.log(`server running on port ${PORT}`);
+  logger.info(`server running on port ${PORT}`);
 });
