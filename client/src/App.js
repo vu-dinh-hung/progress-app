@@ -112,15 +112,6 @@ const App = () => {
     displayMessage('Logged out');
   };
 
-  const handleSubmitHabit = async ({ newHabit }) => {
-    let habit = { id: habits.length + 1, name: newHabit };
-    if (user) {
-      // if logged in, send request to server, else only change interface for guest mode
-      habit = await habitService.post(habit);
-    }
-    setHabits(habits.concat(habit));
-  };
-
   const handleToggleCell = async (cellDay, habitId, cellIsChecked) => {
     console.log('----------------clicked cell', habitId, cellDay);
 
@@ -144,10 +135,20 @@ const App = () => {
     }
   };
 
+  const handleSubmitHabit = async ({ newHabit }) => {
+    let habit = { id: habits.length + 1, name: newHabit };
+    if (user) {
+      // if logged in, send request to server, else only change interface for guest mode
+      habit = await habitService.post(habit);
+    }
+    setHabits(habits.concat(habit));
+  };
+
   const handleDeleteHabit = async (habitId) => {
     console.log('removing', habitId);
     setHabitIdToDelete(null);
     setHabits(habits.filter((habit) => !(habit.id === habitId)));
+    setLogs(logs.filter((log) => !(log.habitId === habitId)));
     if (user) {
       // if logged in, send request to server, else only change interface for guest mode
       await habitService.deleteById(habitId);
