@@ -22,10 +22,11 @@ router.post('/', async (req, res) => {
   const { username, name, password } = req.body;
   // Validate
   if (!username) return res.status(400).json({ error: 'Missing username' });
-  if (password === undefined || password.length < 8)
-    return res.status(400).json({ error: 'Password too short. Please use at least 8 characters' });
   if (await User.exists({ username }))
     return res.status(400).json({ error: 'Username already exists. Please pick a different one' });
+  if (password === undefined || password.length < 8)
+    return res.status(400).json({ error: 'Password too short. Please use at least 8 characters' });
+  if (password.includes(' ')) return res.status(400).json({ error: 'Password should contain no whitespace' });
 
   // Create user
   const rounds = 11;
