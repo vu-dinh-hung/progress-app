@@ -6,7 +6,6 @@ const { startOfMonth, endOfMonth, startOfDay, endOfDay } = require('date-fns');
 
 router.get('/', async (req, res) => {
   const decodedToken = auth.verify(req);
-  if (!decodedToken) return res.status(401).json({ error: 'invalid token' });
 
   const yearmonth = req.query.yearmonth;
   if (yearmonth) {
@@ -25,7 +24,6 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   const decodedToken = auth.verify(req);
-  if (!decodedToken) return res.status(401).json({ error: 'invalid token' });
 
   const log = await Log.findById(req.params.id);
   if (log && log.userId.toString() === decodedToken.id) {
@@ -37,7 +35,6 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   const decodedToken = auth.verify(req);
-  if (!decodedToken) return res.status(401).json({ error: 'invalid token' });
 
   // validation
   const { habitId, date: datestr } = req.body;
@@ -63,7 +60,6 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   const decodedToken = auth.verify(req);
-  if (!decodedToken) return res.status(401).json({ error: 'invalid token' });
 
   const logToBeChanged = await Log.findById(req.params.id);
   if (logToBeChanged && logToBeChanged.userId.toString() === decodedToken.id) {
@@ -80,7 +76,6 @@ router.put('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
   const decodedToken = auth.verify(req);
-  if (!decodedToken) return res.status(401).json({ error: 'invalid token' });
 
   await Log.deleteOne({ _id: req.params.id, userId: decodedToken.id });
   res.status(204).end();

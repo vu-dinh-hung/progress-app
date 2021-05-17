@@ -5,7 +5,6 @@ const auth = require('../utils/auth');
 
 router.get('/', async (req, res) => {
   const decodedToken = auth.verify(req);
-  if (!decodedToken) return res.status(401).json({ error: 'invalid token' });
 
   const habits = await Habit.find({ userId: decodedToken.id });
   res.json(habits);
@@ -13,10 +12,9 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   const decodedToken = auth.verify(req);
-  if (!decodedToken) return res.status(401).json({ error: 'invalid token' });
 
   const habit = await Habit.findById(req.params.id);
-  console.log(habit);
+  logger.debug('getting habit:', habit);
   if (habit && habit.userId.toString() === decodedToken.id) {
     res.json(habit);
   } else {
@@ -26,7 +24,6 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   const decodedToken = auth.verify(req);
-  if (!decodedToken) return res.status(401).json({ error: 'invalid token' });
 
   const newHabit = new Habit({ userId: decodedToken.id, name: req.body.name });
   const savedHabit = await newHabit.save();
@@ -35,7 +32,6 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   const decodedToken = auth.verify(req);
-  if (!decodedToken) return res.status(401).json({ error: 'invalid token' });
 
   const habitToBeChanged = await Habit.findById(req.params.id);
   if (habitToBeChanged && habitToBeChanged.userId === decodedToken.id) {
@@ -49,7 +45,6 @@ router.put('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
   const decodedToken = auth.verify(req);
-  if (!decodedToken) return res.status(401).json({ error: 'invalid token' });
 
   await Habit.deleteOne({ _id: req.params.id, userId: decodedToken.id });
   await Log.deleteMany({ habitId: req.params.id, userId: decodedToken.id });
