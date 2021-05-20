@@ -2,6 +2,7 @@ const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { SECRET } = require('../utils/config');
+const auth = require('../utils/auth');
 const User = require('../models/user');
 
 router.get('/', async (req, res) => {
@@ -49,20 +50,25 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
+  const decodedToken = auth.verify(req);
+
   const userToBeChanged = await User.findById(req.params.id);
-  if (userToBeChanged) {
-    const newUser = {
-      name: req.body.name,
-    };
-    const changedUser = await User.findByIdAndUpdate(req.params.id, newUser);
-    res.status(201).json(changedUser);
-  } else {
-    res.status(404).end();
-  }
+  if (userToBeChanged._id.toString() !== decodedToken.id) return res.status(401).end();
+  if (!userToBeChanged) return res.status(404);
+
+  const newUser = {
+    name: req.body.name,
+  };
+  const changedUser = await User.findByIdAndUpdate(req.params.id, newUser, { new: true });
+  res.status(201).json(changedUser);
 });
 
 router.delete('/:id', async (req, res) => {
-  await User.findByIdAndDelete(req.params.id);
+  const decodedToken = auth.verify(req);
+  const user = await User.findById(req.params.id);
+  if (user._id.toString() !== decodedToken.id) return res.status(401).end();
+
+  await user.remove();
   res.status(204).end();
 });
 
