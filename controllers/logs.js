@@ -58,22 +58,6 @@ router.post('/', async (req, res) => {
   res.status(201).json(savedLog);
 });
 
-router.put('/:id', async (req, res) => {
-  const decodedToken = auth.verify(req);
-
-  const logToBeChanged = await Log.findById(req.params.id);
-  if (logToBeChanged && logToBeChanged.userId.toString() === decodedToken.id) {
-    const newLog = {
-      habitId: req.body.habitId,
-      date: req.body.date,
-    };
-    const changedLog = await Log.findByIdAndUpdate(req.params.id, newLog, { new: true });
-    res.json(changedLog);
-  } else {
-    res.status(404).end();
-  }
-});
-
 router.delete('/:id', async (req, res) => {
   const decodedToken = auth.verify(req);
 
