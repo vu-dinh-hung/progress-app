@@ -22,6 +22,7 @@ router.post('/', async (req, res) => {
   const { username, name, password } = req.body;
   // Validate
   if (!username) return res.status(400).json({ error: 'Missing username' });
+  if (username.includes(' ')) return res.status(400).json({ error: 'Username should contain no whitespace' });
   if (await User.exists({ username }))
     return res.status(400).json({ error: 'Username already exists. Please pick a different one' });
   if (password === undefined || password.length < 8)
