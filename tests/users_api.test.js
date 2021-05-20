@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const supertest = require('supertest');
-const bcrypt = require('bcryptjs');
 
 const app = require('../app');
 const helper = require('./test_helper');
@@ -9,18 +8,14 @@ const User = require('../models/user');
 const api = supertest(app);
 const baseUrl = '/api/users';
 
-let userData, userId;
+let testUserData, testUserId;
 
 beforeEach(async () => {
-  await User.deleteMany({});
+  const testuser = await helper.setUpUser();
+  testUserId = testuser._id.toString();
 
-  const passwordHash = await bcrypt.hash('p4ssw0rd', 11);
-  const user = new User({ username: 'testuser', passwordHash, name: 'test' });
-  await user.save();
-  userId = user._id.toString();
-
-  const res = await api.post('/api/login').send({ username: 'testuser', password: 'p4ssw0rd' });
-  userData = res.body;
+  const loginRes = await api.post('/api/login').send({ username: helper.testUsername, password: helper.testPassword });
+  testUserData = loginRes.body;
 });
 
 describe(`GET ${baseUrl}`, () => {
@@ -29,7 +24,7 @@ describe(`GET ${baseUrl}`, () => {
       .get(baseUrl)
       .expect(200)
       .expect('Content-Type', /application\/json/);
-    const currentUsers = await helper.getUsersInDb();
+    const currentUsers = await User.find({});
     expect(res.body).toHaveLength(currentUsers.length);
   });
 });
@@ -37,11 +32,11 @@ describe(`GET ${baseUrl}`, () => {
 describe(`GET ${baseUrl}/<id>`, () => {
   test('returns correct user with valid id', async () => {
     const res = await api
-      .get(`${baseUrl}/${userId}`)
+      .get(`${baseUrl}/${testUserId}`)
       .expect(200)
       .expect('Content-Type', /application\/json/);
-    const user = await User.findById(userId);
-    expect(res.body.id).toBe(userId);
+    const user = await User.findById(testUserId);
+    expect(res.body.id).toBe(testUserId);
     expect(res.body.id).toBe(user.id);
     expect(res.body.username).toBe(user.username);
   });
@@ -58,7 +53,7 @@ describe(`GET ${baseUrl}/<id>`, () => {
 
 describe(`POST ${baseUrl}`, () => {
   test('succeeds with valid username and password', async () => {
-    const usersBeforePost = await helper.getUsersInDb();
+    const usersBeforePost = await User.find({});
 
     const user = {
       username: 'newUser',
@@ -70,13 +65,13 @@ describe(`POST ${baseUrl}`, () => {
       .expect(201)
       .expect('Content-Type', /application\/json/);
 
-    const usersAfterPost = await helper.getUsersInDb();
+    const usersAfterPost = await User.find({});
     expect(usersAfterPost).toHaveLength(usersBeforePost.length + 1);
     expect(res.body.username).toBe('newUser');
   });
 
   test('fails with 400 with invalid username or invalid password', async () => {
-    const usersBeforePost = await helper.getUsersInDb();
+    const usersBeforePost = await User.find({});
 
     const whitespaceUsername = {
       username: 'new user',
@@ -102,7 +97,7 @@ describe(`POST ${baseUrl}`, () => {
     await api.post(baseUrl).send(shortPassword).expect(400);
     await api.post(baseUrl).send(undefinedPassword).expect(400);
 
-    const usersAfterPost = await helper.getUsersInDb();
+    const usersAfterPost = await User.find({});
     expect(usersAfterPost).toHaveLength(usersBeforePost.length);
   });
 });
@@ -114,12 +109,12 @@ describe(`PUT ${baseUrl}/<id>`, () => {
     };
 
     const res = await api
-      .put(`${baseUrl}/${userId}`)
-      .set('Authorization', `bearer ${userData.token}`)
+      .put(`${baseUrl}/${testUserId}`)
+      .set('Authorization', `bearer ${testUserData.token}`)
       .send(changedUser)
       .expect(201);
-    expect(res.body.name).toBe('newname');
-    expect((await User.findById(userId)).name).toBe('newname');
+    expect(res.body.name).toBe(changedUser.name);
+    expect((await User.findById(testUserId)).name).toBe(changedUser.name);
   });
 
   test('fails with 400 with invalid id', async () => {
@@ -129,7 +124,7 @@ describe(`PUT ${baseUrl}/<id>`, () => {
 
     await api
       .put(`${baseUrl}/12345abcde`)
-      .set('Authorization', `bearer ${userData.token}`)
+      .set('Authorization', `bearer ${testUserData.token}`)
       .send(changedUser)
       .expect(400);
   });
@@ -139,9 +134,9 @@ describe(`PUT ${baseUrl}/<id>`, () => {
       name: 'newname',
     };
 
-    await api.put(`${baseUrl}/${userId}`).send(changedUser).expect(401);
+    await api.put(`${baseUrl}/${testUserId}`).send(changedUser).expect(401);
     await api
-      .put(`${baseUrl}/${userId}`)
+      .put(`${baseUrl}/${testUserId}`)
       .set('Authorization', `bearer ${(await helper.getNonexistentToken()).token}`)
       .send(changedUser)
       .expect(401);
@@ -150,25 +145,25 @@ describe(`PUT ${baseUrl}/<id>`, () => {
 
 describe(`DELETE ${baseUrl}/<id>`, () => {
   test('succeeds with valid id', async () => {
-    const usersBeforeDelete = await helper.getUsersInDb();
-    await api.delete(`${baseUrl}/${userId}`).set('Authorization', `bearer ${userData.token}`).expect(204);
-    expect(await helper.getUsersInDb()).toHaveLength(usersBeforeDelete.length - 1);
+    const usersBeforeDelete = await User.find({});
+    await api.delete(`${baseUrl}/${testUserId}`).set('Authorization', `bearer ${testUserData.token}`).expect(204);
+    expect(await User.find({})).toHaveLength(usersBeforeDelete.length - 1);
   });
 
   test('fails with 400 with invalid id', async () => {
-    const usersBeforeDelete = await helper.getUsersInDb();
-    await api.delete(`${baseUrl}/12345abcde`).set('Authorization', `bearer ${userData.token}`).expect(400);
-    expect(await helper.getUsersInDb()).toHaveLength(usersBeforeDelete.length);
+    const usersBeforeDelete = await User.find({});
+    await api.delete(`${baseUrl}/12345abcde`).set('Authorization', `bearer ${testUserData.token}`).expect(400);
+    expect(await User.find({})).toHaveLength(usersBeforeDelete.length);
   });
 
   test('fails with 401 with invalid or missing token', async () => {
-    const usersBeforeDelete = await helper.getUsersInDb();
-    await api.delete(`${baseUrl}/${userId}`).expect(401);
+    const usersBeforeDelete = await User.find({});
+    await api.delete(`${baseUrl}/${testUserId}`).expect(401);
     await api
-      .delete(`${baseUrl}/${userId}`)
+      .delete(`${baseUrl}/${testUserId}`)
       .set('Authorization', `bearer ${(await helper.getNonexistentToken).token}`)
       .expect(401);
-    expect(await helper.getUsersInDb()).toHaveLength(usersBeforeDelete.length);
+    expect(await User.find({})).toHaveLength(usersBeforeDelete.length);
   });
 });
 

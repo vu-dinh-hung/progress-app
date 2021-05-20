@@ -2,6 +2,7 @@ const router = require('express').Router();
 const Habit = require('../models/habit');
 const Log = require('../models/log');
 const auth = require('../utils/auth');
+const logger = require('../utils/logger');
 
 router.get('/', async (req, res) => {
   const decodedToken = auth.verify(req);
@@ -34,13 +35,11 @@ router.put('/:id', async (req, res) => {
   const decodedToken = auth.verify(req);
 
   const habitToBeChanged = await Habit.findById(req.params.id);
-  if (habitToBeChanged && habitToBeChanged.userId === decodedToken.id) {
-    const newHabit = { name: req.body.name };
-    const changedHabit = await Habit.findByIdAndUpdate(req.params.id, newHabit, { new: true });
-    res.json(changedHabit);
-  } else {
-    res.status(404).end();
-  }
+  if (!habitToBeChanged || habitToBeChanged.userId.toString() !== decodedToken.id) return res.status(404).end();
+
+  const newHabit = { name: req.body.name };
+  const changedHabit = await Habit.findByIdAndUpdate(req.params.id, newHabit, { new: true });
+  res.json(changedHabit);
 });
 
 router.delete('/:id', async (req, res) => {
