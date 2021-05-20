@@ -7,7 +7,7 @@
 logLevel = 0;
 
 if (process.env.NODE_ENV === 'test') {
-  logLevel = 1;
+  logLevel = 0;
 } else if (process.env.NODE_ENV === 'production') {
   logLevel = 2;
 } else if (process.env.NODE_ENV === 'development') {
@@ -15,17 +15,17 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 const error = (...params) => {
-  if (logLevel === 0) return;
+  if (logLevel < 1) return;
   console.error('[error]', ...params);
 };
 
 const info = (...params) => {
-  if (logLevel === 1) return;
+  if (logLevel < 2) return;
   console.log('[info]', ...params);
 };
 
 const debug = (...params) => {
-  if (logLevel === 2) return;
+  if (logLevel < 3) return;
   console.log('[debug]', ...params);
 };
 
