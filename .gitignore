@@ -1,3 +1,17 @@
-/node_modules
-/requests
+# python
+/env
+/venv
+__pycache__
+
+# testing
+db.sqlite
+db_dev.sqlite
+/rest-client
+.pytest_cache
+
+# config
 .env
+
+# misc
+.vscode
+.DS_Store
