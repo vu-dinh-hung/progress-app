@@ -1,12 +1,12 @@
 """Module for user_router blueprint"""
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
 import bcrypt
 from flask_jwt_extended import (
     jwt_required,
     get_jwt_identity,
     create_access_token
 )
-from main.models.user import User, user_schema, login_schema, new_user_schema
+from main.models.user import User, user_schema, new_user_schema, login_schema
 
 user_router = Blueprint('user_router', __name__)
 
@@ -28,7 +28,7 @@ def login():
     return {
         'access_token': access_token,
         'user': user_schema.dump(user)
-    }
+    }, 200
 
 
 @user_router.route('/users', methods=['POST'])
@@ -46,7 +46,7 @@ def post_user():
     user = User(**user_data, password_hash=password_hash)
     user.save()
 
-    return user_schema.dump(user), 201
+    return user_schema.dumps(user), 201
 
 
 @user_router.route('/users/<user_id>', methods=['GET'])
@@ -58,7 +58,7 @@ def get_user(user_id):
 
     user = User.find_by_id(user_id)
     if user:
-        return user.to_dict()
+        return user_schema.dumps(user), 200
     else:
         return {'message': 'User not found'}, 404
 
@@ -77,6 +77,6 @@ def put_user(user_id):
             'data': errors
         }, 400
 
-    User.update(user_id, user_schema.load(body))
+    User.update_by_id(user_id, user_schema.load(body))
     user = User.find_by_id(user_id)
-    return user_schema.dump(user), 200
+    return user_schema.dumps(user), 200

@@ -1,8 +1,8 @@
 """Module for User model"""
 import bcrypt
-from marshmallow.exceptions import ValidationError
-from main.db import db, session_scope
 from marshmallow import Schema, fields, validate, validates_schema
+from marshmallow.exceptions import ValidationError
+from main.db import db, session_scope, BaseSchema
 
 
 class User(db.Model):
@@ -26,11 +26,6 @@ class User(db.Model):
         return True
 
     @classmethod
-    def find_by_id(cls, user_id):
-        """Return the user with the given id or None if the id does not exist"""
-        return cls.query.get(user_id)
-
-    @classmethod
     def find_by_username(cls, username):
         """Return the user with the given username
         or None if the username does not exist
@@ -38,7 +33,8 @@ class User(db.Model):
         return cls.query.filter_by(username=username).first()
 
     @classmethod
-    def update(cls, user_id, data_dict):
+    def update_by_id(cls, user_id, data_dict):
+        """Update the user with the given id using the given data dictionary"""
         with session_scope() as session:
             session.query(User).filter_by(id=user_id).update(data_dict)
 
@@ -48,17 +44,16 @@ class User(db.Model):
             session.add(self)
 
 
-class UserSchema(Schema):
-    id = fields.Int(dump_only=True)
+class UserSchema(BaseSchema):
     username = fields.String(dump_only=True)
     name = fields.String()
-    status = fields.String(load_only=True, validate=[validate.OneOf(('active', 'deleted'))])
 
 
 class NewUserSchema(Schema):
     min_username, max_username = 4, 30
     username = fields.String(
         required=True,
+        load_only=True,
         validate=[
             validate.Length(
                 min=min_username,
@@ -69,6 +64,7 @@ class NewUserSchema(Schema):
     )
     password = fields.String(
         required=True,
+        load_only=True,
         validate=[validate.Length(min=8, error='Password must be at least 8 characters')]
     )
     name = fields.String()

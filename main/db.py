@@ -4,6 +4,7 @@ from contextlib import contextmanager
 from flask_sqlalchemy import Model, SQLAlchemy
 import sqlalchemy as sa
 from sqlalchemy.orm import validates
+from marshmallow import Schema, fields, validate
 
 
 class Base(Model):
@@ -30,6 +31,11 @@ class Base(Model):
         if self.updated_at:
             raise ValueError('Cannot update created_at')
         return value
+
+
+class BaseSchema(Schema):
+    id = fields.Int(dump_only=True)
+    status = fields.String(load_only=True, validate=[validate.OneOf(('active', 'deleted'))])
 
 
 @contextmanager
