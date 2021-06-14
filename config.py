@@ -1,5 +1,5 @@
 import os
-
+import datetime
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'defaulthardtoguessstring')
@@ -9,6 +9,7 @@ class Config:
 class DevConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL', 'sqlite:///db_dev.sqlite')
+    JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(days=1)
 
 
 class TestConfig(Config):

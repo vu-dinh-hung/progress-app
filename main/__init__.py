@@ -1,20 +1,19 @@
 '''Module for initializing the Flask application'''
 from flask import Flask
+from flask_jwt_extended import JWTManager
 from config import config
 from main.db import db
-from main.models.user import User
+from main.controllers.user_router import user_router
 
+jwt = JWTManager()
 
 def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     db.init_app(app)
+    jwt.init_app(app)
 
     # routes
-    @app.route('/hello/<name>')
-    def greet(name):
-        user = User(username=name, passwordHash='random')
-        user.save()
-        return User.find_by_username(name).to_dict()
+    app.register_blueprint(user_router)
 
     return app
