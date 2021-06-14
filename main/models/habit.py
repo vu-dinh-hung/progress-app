@@ -1,7 +1,7 @@
 """Module for Habit model"""
-from sqlalchemy.orm import load_only, validates
-from marshmallow import Schema, fields, validate, validates_schema
-from main.db import db, session_scope
+from sqlalchemy.orm import validates
+from marshmallow import Schema, fields, validate
+from main.db import db
 
 
 class Habit(db.Model):
@@ -35,13 +35,20 @@ class Habit(db.Model):
 class HabitSchema(Schema):
     id = fields.Int(dump_only=True)
     name = fields.String()
-    countable = fields.Boolean(load_only=True)
+    countable = fields.Boolean(dump_only=True)
     status = fields.String(load_only=True, validate=[validate.OneOf(('active', 'deleted'))])
 
+
 class NewHabitSchema(Schema):
+    min_name, max_name = 1, 80
     name = fields.String(
         required=True,
-        validate=[validate.Length(min=1, error='Habit name cannot be empty')],
+        validate=[
+            validate.Length(
+                min=min_name, max=max_name,
+                error=f'Habit name should be between {min_name} and {max_name} characters'
+            )
+        ],
         error_messages={'required': {'message': 'Habit name required'}}
     )
     countable = fields.Boolean()

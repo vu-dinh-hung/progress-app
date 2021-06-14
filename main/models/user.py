@@ -2,7 +2,7 @@
 import bcrypt
 from marshmallow import Schema, fields, validate, validates_schema
 from marshmallow.exceptions import ValidationError
-from main.db import db, session_scope, BaseSchema
+from main.db import db, BaseSchema
 
 
 class User(db.Model):
@@ -45,8 +45,7 @@ class NewUserSchema(Schema):
         load_only=True,
         validate=[
             validate.Length(
-                min=min_username,
-                max=max_username,
+                min=min_username, max=max_username,
                 error=f'Username must be between {min_username} and {max_username} characters'
             )
         ],
