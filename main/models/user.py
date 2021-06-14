@@ -32,17 +32,6 @@ class User(db.Model):
         """
         return cls.query.filter_by(username=username).first()
 
-    @classmethod
-    def update_by_id(cls, user_id, data_dict):
-        """Update the user with the given id using the given data dictionary"""
-        with session_scope() as session:
-            session.query(User).filter_by(id=user_id).update(data_dict)
-
-    def save(self):
-        """Add/update this user in the database"""
-        with session_scope() as session:
-            session.add(self)
-
 
 class UserSchema(BaseSchema):
     username = fields.String(dump_only=True)
@@ -60,12 +49,14 @@ class NewUserSchema(Schema):
                 max=max_username,
                 error=f'Username must be between {min_username} and {max_username} characters'
             )
-        ]
+        ],
+        error_messages={'required': {'message': 'Username required'}}
     )
     password = fields.String(
         required=True,
         load_only=True,
-        validate=[validate.Length(min=8, error='Password must be at least 8 characters')]
+        validate=[validate.Length(min=8, error='Password must be at least 8 characters')],
+        error_messages={'required': {'message': 'Username required'}}
     )
     name = fields.String()
 

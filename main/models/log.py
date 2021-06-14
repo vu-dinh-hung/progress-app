@@ -28,23 +28,3 @@ class Log(db.Model):
         if self.date:
             raise ValueError('Cannot update date')
         return value
-
-    def to_dict(self) -> dict:
-        """Return the dictionary representation of this log"""
-        return {
-            'id': self.id,
-            'habit_id': self.habit_id,
-            'date': self.date.isoformat(),
-            'count': self.count
-        }
-
-    @classmethod
-    def find_by_id(cls, log_id):
-        """Return the log with the given id
-        or None if the id does not exist"""
-        return cls.query.get(log_id)
-
-    def save(self):
-        """Add/update this log in the database"""
-        with session_scope() as session:
-            db.session.add(self)

@@ -43,6 +43,7 @@ def post_user():
 
     user_data = new_user_schema.load(body)
     password_hash = bcrypt.hashpw(user_data['password'].encode('utf-8'), bcrypt.gensalt(14))
+    user_data.pop('password')
     user = User(**user_data, password_hash=password_hash)
     user.save()
 

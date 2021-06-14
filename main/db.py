@@ -7,6 +7,18 @@ from sqlalchemy.orm import validates
 from marshmallow import Schema, fields, validate
 
 
+@contextmanager
+def session_scope():
+    """Provide a transactional scope"""
+    session = db.session
+    try:
+        yield session
+        session.commit()
+    except:
+        session.rollback()
+        raise
+
+
 class Base(Model):
     """Base class for all Models"""
     id = sa.Column(sa.Integer, primary_key=True)
@@ -32,22 +44,27 @@ class Base(Model):
             raise ValueError('Cannot update created_at')
         return value
 
+    @classmethod
+    def find_by_id(cls, _id):
+        """Return the resource with the given id
+        or None if the id does not exist"""
+        return cls.query.get(_id)
+
+    @classmethod
+    def update_by_id(cls, _id, data_dict):
+        """Update the resource with the given id using data_dict"""
+        with session_scope() as session:
+            session.query(cls).filter_by(id=_id).update(data_dict)
+
+    def save(self):
+        """Add/update this resource in the database"""
+        with session_scope() as session:
+            db.session.add(self)
+
 
 class BaseSchema(Schema):
     id = fields.Int(dump_only=True)
     status = fields.String(load_only=True, validate=[validate.OneOf(('active', 'deleted'))])
-
-
-@contextmanager
-def session_scope():
-    """Provide a transactional scope"""
-    session = db.session
-    try:
-        yield session
-        session.commit()
-    except:
-        session.rollback()
-        raise
 
 
 db = SQLAlchemy(model_class=Base)

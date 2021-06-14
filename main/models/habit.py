@@ -1,6 +1,7 @@
 """Module for Habit model"""
+from sqlalchemy.orm import load_only, validates
+from marshmallow import Schema, fields, validate, validates_schema
 from main.db import db, session_scope
-from sqlalchemy.orm import validates
 
 
 class Habit(db.Model):
@@ -12,8 +13,9 @@ class Habit(db.Model):
     countable = db.Column(db.Boolean, default=False, nullable=False)
 
     def __repr__(self) -> str:
-        return f'<Habit(name={self.name}, user_id={self.user_id}, countable={self.countable}, ' +\
-            f'id={self.id}, created_at={self.created_at}, updated_at={self.updated_at})>'
+        return f'<Habit(id={self.id}, name={self.name}, user_id={self.user_id}, ' +\
+            f'countable={self.countable}, status={self.status}, ' +\
+            f'created_at={self.created_at}, updated_at={self.updated_at})>'
 
     def __eq__(self, o: object) -> bool:
         if not isinstance(o, Habit): return False
@@ -29,22 +31,21 @@ class Habit(db.Model):
             raise ValueError('Cannot update countable')
         return value
 
-    def to_dict(self) -> dict:
-        """Return the dictionary representation of this habit"""
-        return {
-            'id': self.id,
-            'user_id': self.user_id,
-            'name': self.name,
-            'countable': self.countable
-        }
 
-    @classmethod
-    def find_by_id(cls, habit_id):
-        """Return the habit with the given id
-        or None if the id does not exist"""
-        return cls.query.get(habit_id)
+class HabitSchema(Schema):
+    id = fields.Int(dump_only=True)
+    name = fields.String()
+    countable = fields.Boolean(load_only=True)
+    status = fields.String(load_only=True, validate=[validate.OneOf(('active', 'deleted'))])
 
-    def save(self):
-        """Add/update this habit in the database"""
-        with session_scope() as session:
-            db.session.add(self)
+class NewHabitSchema(Schema):
+    name = fields.String(
+        required=True,
+        validate=[validate.Length(min=1, error='Habit name cannot be empty')],
+        error_messages={'required': {'message': 'Habit name required'}}
+    )
+    countable = fields.Boolean()
+
+habit_schema = HabitSchema()
+habits_schema = HabitSchema(many=True)
+new_habit_schema = NewHabitSchema()
