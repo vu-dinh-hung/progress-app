@@ -1,6 +1,7 @@
 """Module for Log model"""
-from main.db import db, session_scope
 from sqlalchemy.orm import validates
+from marshmallow import Schema, fields
+from main.db import db, BaseSchema
 
 
 class Log(db.Model):
@@ -23,8 +24,35 @@ class Log(db.Model):
         if self.count != o.count: return False
         return True
 
+    @classmethod
+    def get_one(cls, **kwargs):
+        return cls.query.filter_by(**kwargs).first()
+
     @validates('date')
     def validate_updated_at(self, key, value):
         if self.date:
             raise ValueError('Cannot update date')
         return value
+
+
+class LogSchema(BaseSchema):
+    date = fields.Date(dump_only=True)
+    count = fields.Integer(strict=True)
+
+
+class NewLogSchema(Schema):
+    date = fields.Date(
+        required=True,
+        load_only=True,
+        error_messages={'required': {'message': 'Habit name required'}}
+    )
+
+
+class NewLogWithCountSchema(NewLogSchema):
+    count = fields.Integer(strict=True, load_only=True)
+
+
+log_schema = LogSchema()
+logs_schema = LogSchema(many=True)
+new_log_schema = NewLogSchema()
+new_log_with_count_schema = NewLogWithCountSchema()

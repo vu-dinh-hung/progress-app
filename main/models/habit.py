@@ -1,7 +1,7 @@
 """Module for Habit model"""
 from sqlalchemy.orm import validates
 from marshmallow import Schema, fields, validate
-from main.db import db
+from main.db import db, BaseSchema
 
 
 class Habit(db.Model):
@@ -32,11 +32,9 @@ class Habit(db.Model):
         return value
 
 
-class HabitSchema(Schema):
-    id = fields.Int(dump_only=True)
+class HabitSchema(BaseSchema):
     name = fields.String()
     countable = fields.Boolean(dump_only=True)
-    status = fields.String(load_only=True, validate=[validate.OneOf(('active', 'deleted'))])
 
 
 class NewHabitSchema(Schema):
