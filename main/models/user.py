@@ -1,7 +1,7 @@
 """Module for User model"""
 import bcrypt
-from marshmallow import Schema, fields, validate, validates_schema
-from marshmallow.exceptions import ValidationError
+from marshmallow import Schema, fields, validate, validates, ValidationError
+from marshmallow.decorators import post_load
 from main.db import db, BaseSchema
 
 
@@ -24,10 +24,35 @@ class User(db.Model):
         """
         return cls.query.filter_by(username=username).first()
 
+    @staticmethod
+    def hash_password(password):
+        """Return a secure hash for the given password"""
+        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(14))
+
+    def check_password(self, password):
+        """Compare the given password with the user's password_hash"""
+        return bcrypt.checkpw(password.encode('utf-8'), self.password_hash)
+
+
+def validate_password(password):
+    """Validate a password"""
+    if len(password) < 8:
+        raise ValidationError('Password must be at least 8 characters')
+    if ' ' in password:
+        raise ValidationError('Password must not contain whitespace')
+
 
 class UserSchema(BaseSchema):
     username = fields.String(dump_only=True)
     name = fields.String()
+    password = fields.String(load_only=True, validate=[validate_password])
+
+    @post_load
+    def make_password_hash(self, data, **kwargs):
+        if data.get('password'):
+            data['password_hash'] = User.hash_password(data['password'])
+            data.pop('password', None)
+        return data
 
 
 class NewUserSchema(Schema):
@@ -47,21 +72,22 @@ class NewUserSchema(Schema):
     password = fields.String(
         required=True,
         load_only=True,
-        validate=[validate.Length(min=8, error='Password must be at least 8 characters')],
+        validate=[validate_password],
         error_messages={'required': 'Password required'}
     )
     name = fields.String()
 
-    @validates_schema
-    def check_credentials(self, data, **kwargs):
-        errors = {}
-
-        user = User.find_by_username(data['username'])
+    @validates('username')
+    def check_duplicate_username(self, username, **kwargs):
+        user = User.find_by_username(username)
         if user:
-            errors['username'] = ['Username already exist']
+            raise ValidationError('Username already exist')
 
-        if errors:
-            raise ValidationError(errors)
+    @post_load
+    def make_password_hash(self, data, **kwargs):
+        data['password_hash'] = User.hash_password(data['password'])
+        data.pop('password')
+        return data
 
 
 class LoginSchema(Schema):
@@ -71,19 +97,6 @@ class LoginSchema(Schema):
     password = fields.String(
         required=True, load_only=True, error_messages={'required': 'Password required'}
     )
-
-    @validates_schema
-    def check_credentials(self, data, **kwargs):
-        errors = {}
-
-        user = User.find_by_username(data['username'])
-        if not user:
-            errors['username'] = ['Wrong username']
-        if user and not bcrypt.checkpw(data['password'].encode('utf-8'), user.password_hash):
-            errors['password'] = ['Wrong password']
-
-        if errors:
-            raise ValidationError(errors)
 
 
 user_schema = UserSchema()

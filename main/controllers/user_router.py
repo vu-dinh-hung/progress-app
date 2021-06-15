@@ -1,6 +1,5 @@
 """Module for user_router blueprint"""
 from flask import Blueprint, request
-import bcrypt
 from flask_jwt_extended import (
     jwt_required,
     get_jwt_identity,
@@ -17,12 +16,17 @@ def login():
     errors = login_schema.validate(body)
     if errors:
         return {
-            'message': 'Invalid credentials',
+            'message': 'Missing field(s)',
             'data': errors
         }, 401
 
     credentials = login_schema.load(body)
     user = User.find_by_username(credentials['username'])
+    if not user or not user.check_password(credentials['password']):
+        return {
+            'message': 'Wrong username or password'
+        }, 401
+
     access_token = create_access_token(identity=user.id, fresh=True)
 
     return {
@@ -42,9 +46,7 @@ def post_user():
         }, 400
 
     user_data = new_user_schema.load(body)
-    password_hash = bcrypt.hashpw(user_data['password'].encode('utf-8'), bcrypt.gensalt(14))
-    user_data.pop('password')
-    user = User(**user_data, password_hash=password_hash)
+    user = User(**user_data)
     user.save()
 
     return user_schema.dumps(user), 201
@@ -78,6 +80,8 @@ def put_user(user_id):
             'data': errors
         }, 400
 
-    User.update_by_id(user_id, user_schema.load(body))
+    update_data = user_schema.load(body)
+    User.update_by_id(user_id, update_data)
     user = User.find_by_id(user_id)
+
     return user_schema.dumps(user), 200

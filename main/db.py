@@ -63,7 +63,7 @@ class Base(Model):
     def save(self):
         """Add/update this resource in the database"""
         with session_scope() as session:
-            db.session.add(self)
+            session.add(self)
 
 
 class BaseSchema(Schema):
