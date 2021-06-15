@@ -51,9 +51,8 @@ class Base(Model):
     @classmethod
     def find_by_id(cls, _id):
         """Return the resource with the given id
-        or None if the id doesn't exist or the resource status == 'deleted'"""
-        result = cls.query.get(_id)
-        return result if (result and result.status != 'deleted') else None
+        or None if the id doesn't exist"""
+        return cls.query.get(_id)
 
     @classmethod
     def update_by_id(cls, _id, data_dict):
