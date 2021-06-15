@@ -1,7 +1,7 @@
 '''Module for initializing the Flask application'''
 from flask import Flask
 from flask_jwt_extended import JWTManager
-from config import config
+from main.config import config
 from main.db import db
 from main.controllers.user_router import user_router
 from main.controllers.habit_router import habit_router
