@@ -44,7 +44,7 @@ def post_log(user_id, habit_id):
         log = Log(**log_data, habit_id=int(habit_id))
         log.save()
 
-    return log_schema.dumps(log), 201
+    return log_schema.dump(log), 201
 
 
 @log_router.route(f'{base_url}/logs/<log_id>', methods=['PUT'])
@@ -74,4 +74,4 @@ def put_log(user_id, habit_id, log_id):
     Log.update_by_id(log_id, log_data)
     updated_log = Log.find_by_id(log_id)
 
-    return log_schema.dumps(updated_log), 200
+    return log_schema.dump(updated_log), 200

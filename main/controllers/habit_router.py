@@ -59,7 +59,7 @@ def post_habit(user_id):
     habit = Habit(**habit_data, user_id=int(user_id))
     habit.save()
 
-    return habit_schema.dumps(habit), 201
+    return habit_schema.dump(habit), 201
 
 
 @habit_router.route(f'{base_url}/<habit_id>', methods=['PUT'])
@@ -85,4 +85,4 @@ def put_habit(user_id, habit_id):
     Habit.update_by_id(habit_id, habit_data)
     updated_habit = Habit.find_by_id(habit_id)
 
-    return habit_schema.dumps(updated_habit), 200
+    return habit_schema.dump(updated_habit), 200

@@ -49,7 +49,7 @@ def post_user():
     user = User(**user_data)
     user.save()
 
-    return user_schema.dumps(user), 201
+    return user_schema.dump(user), 201
 
 
 @user_router.route('/users/<user_id>', methods=['GET'])
@@ -61,7 +61,7 @@ def get_user(user_id):
 
     user = User.find_by_id(user_id)
     if user:
-        return user_schema.dumps(user), 200
+        return user_schema.dump(user), 200
     else:
         return {'message': 'User not found'}, 404
 
@@ -84,4 +84,4 @@ def put_user(user_id):
     User.update_by_id(user_id, update_data)
     user = User.find_by_id(user_id)
 
-    return user_schema.dumps(user), 200
+    return user_schema.dump(user), 200
