@@ -2,6 +2,7 @@
 from sqlalchemy.orm import validates
 from marshmallow import Schema, fields, validate
 from main.db import db, BaseSchema
+from main.models.log import LogSchema
 
 
 class Habit(db.Model):
@@ -25,8 +26,18 @@ class Habit(db.Model):
         if self.countable != o.countable: return False
         return True
 
+    @classmethod
+    def get_habit_count(cls):
+        return cls.query.count()
+
+    @classmethod
+    def get_in_month_paginated(cls, *args):
+        habits = cls.query.order_by(cls.created_at.desc()).\
+            paginate(*args).items
+        return habits
+
     @validates('countable')
-    def validate_updated_at(self, key, value):
+    def validate_countable(self, key, value):
         if self.countable:
             raise ValueError('Cannot update countable')
         return value
@@ -35,6 +46,7 @@ class Habit(db.Model):
 class HabitSchema(BaseSchema):
     name = fields.String()
     countable = fields.Boolean(dump_only=True)
+    logs = fields.List(fields.Nested(LogSchema), dump_only=True)
 
 
 class NewHabitSchema(Schema):
@@ -51,6 +63,24 @@ class NewHabitSchema(Schema):
     )
     countable = fields.Boolean()
 
+
+class GetHabitQueryParamsSchema(Schema):
+    year = fields.Integer(
+        required=True,
+        error_messages={'required': {'message': 'Year required'}}
+    )
+    month = fields.Integer(
+        required=True,
+        error_messages={'required': {'message': 'Month required'}}
+    )
+    page = fields.Integer(
+        required=True,
+        error_messages={'required': {'message': 'Page required'}}
+    )
+
+
+
 habit_schema = HabitSchema()
 habits_schema = HabitSchema(many=True)
 new_habit_schema = NewHabitSchema()
+get_habit_query_params_schema = GetHabitQueryParamsSchema()

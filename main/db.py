@@ -22,8 +22,12 @@ def session_scope():
 class Base(Model):
     """Base class for all Models"""
     id = sa.Column(sa.Integer, primary_key=True)
-    created_at = sa.Column(sa.DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = sa.Column(sa.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at = sa.Column(
+        sa.DateTime, default=datetime.utcnow, nullable=False
+    )
+    updated_at = sa.Column(
+        sa.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+    )
     status = sa.Column(sa.String(32), default='active', nullable=False)
 
     @validates('id')
@@ -47,8 +51,9 @@ class Base(Model):
     @classmethod
     def find_by_id(cls, _id):
         """Return the resource with the given id
-        or None if the id does not exist"""
-        return cls.query.get(_id)
+        or None if the id doesn't exist or the resource status == 'deleted'"""
+        result = cls.query.get(_id)
+        return result if (result and result.status != 'deleted') else None
 
     @classmethod
     def update_by_id(cls, _id, data_dict):

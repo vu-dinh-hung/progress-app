@@ -1,5 +1,6 @@
 """Module for Log model"""
 from sqlalchemy.orm import validates
+from sqlalchemy import extract
 from marshmallow import Schema, fields
 from main.db import db, BaseSchema
 
@@ -23,6 +24,11 @@ class Log(db.Model):
         if self.date != o.date: return False
         if self.count != o.count: return False
         return True
+
+    @classmethod
+    def get_by_habit_in_month(cls, habit_id, year, month):
+        return cls.query.filter_by(habit_id=habit_id).filter(extract('year', Log.date)==year).filter(extract('month', Log.date)==month).all()
+
 
     @classmethod
     def get_one(cls, **kwargs):

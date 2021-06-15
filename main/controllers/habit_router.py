@@ -1,7 +1,8 @@
 """Module for habit_router blueprint"""
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from main.models.habit import Habit, habit_schema, habits_schema, new_habit_schema
+from main.models.habit import Habit, habit_schema, habits_schema, new_habit_schema, get_habit_query_params_schema
+from main.models.log import Log
 
 habit_router = Blueprint('habit_router', __name__)
 base_url = '/users/<user_id>/habits'
@@ -14,8 +15,29 @@ def get_habits(user_id):
     if user_id != str(jwt_id):
         return {'message': 'User not found'}, 404
 
-    habits = Habit.query.all()
-    return habits_schema.dumps(habits), 200
+    errors = get_habit_query_params_schema.validate(request.args)
+    if errors:
+        return {
+            'message': 'Invalid query parameters',
+            'data': errors
+        }
+
+    query_params = get_habit_query_params_schema.load(request.args)
+    habits_per_page = 20
+    if not query_params['page']:
+        return {'message': 'Page query parameter required'}
+
+    habits = Habit.get_in_month_paginated(query_params['page'], habits_per_page, False)
+    for habit in habits:
+        habit.logs = Log.get_by_habit_in_month(
+            habit.id, query_params['year'], query_params['month']
+        )
+
+    return {
+        'total_habits': Habit.get_habit_count(),
+        'habits_per_page': habits_per_page,
+        'habits': habits_schema.dump(habits)
+    }, 200
 
 
 @habit_router.route(base_url, methods=['POST'])
