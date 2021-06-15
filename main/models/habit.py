@@ -32,8 +32,8 @@ class Habit(db.Model):
 
     @classmethod
     def get_in_month_paginated(cls, *args):
-        habits = cls.query.order_by(cls.created_at.desc()).\
-            paginate(*args).items
+        habits = cls.query.filter_by(status='active').\
+            order_by(cls.created_at.desc()).paginate(*args).items
         return habits
 
     @validates('countable')
@@ -65,13 +65,13 @@ class NewHabitSchema(Schema):
 
 
 class GetHabitQueryParamsSchema(Schema):
-    year = fields.Integer(
+    logyear = fields.Integer(
         required=True,
-        error_messages={'required': {'message': 'Year required'}}
+        error_messages={'required': {'message': 'Logyear required'}}
     )
-    month = fields.Integer(
+    logmonth = fields.Integer(
         required=True,
-        error_messages={'required': {'message': 'Month required'}}
+        error_messages={'required': {'message': 'Logmonth required'}}
     )
     page = fields.Integer(
         required=True,

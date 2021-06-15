@@ -30,7 +30,7 @@ def get_habits(user_id):
     habits = Habit.get_in_month_paginated(query_params['page'], habits_per_page, False)
     for habit in habits:
         habit.logs = Log.get_by_habit_in_month(
-            habit.id, query_params['year'], query_params['month']
+            habit.id, query_params['logyear'], query_params['logmonth']
         )
 
     return {
