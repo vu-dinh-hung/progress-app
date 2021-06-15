@@ -18,14 +18,6 @@ class Habit(db.Model):
             f'countable={self.countable}, status={self.status}, ' +\
             f'created_at={self.created_at}, updated_at={self.updated_at})>'
 
-    def __eq__(self, o: object) -> bool:
-        if not isinstance(o, Habit): return False
-        if self.id != o.id: return False
-        if self.user_id != o.user_id: return False
-        if self.name != o.name: return False
-        if self.countable != o.countable: return False
-        return True
-
     @classmethod
     def get_habit_count(cls):
         return cls.query.count()
@@ -39,7 +31,7 @@ class Habit(db.Model):
     @validates('countable')
     def validate_countable(self, key, value):
         if self.countable:
-            raise ValueError('Cannot update countable')
+            raise ValueError('Cannot update field: countable')
         return value
 
 
@@ -59,7 +51,7 @@ class NewHabitSchema(Schema):
                 error=f'Habit name should be between {min_name} and {max_name} characters'
             )
         ],
-        error_messages={'required': {'message': 'Habit name required'}}
+        error_messages={'required': 'Habit name required'}
     )
     countable = fields.Boolean()
 
@@ -67,15 +59,15 @@ class NewHabitSchema(Schema):
 class GetHabitQueryParamsSchema(Schema):
     logyear = fields.Integer(
         required=True,
-        error_messages={'required': {'message': 'Logyear required'}}
+        error_messages={'required': 'Logyear required'}
     )
     logmonth = fields.Integer(
         required=True,
-        error_messages={'required': {'message': 'Logmonth required'}}
+        error_messages={'required': 'Logmonth required'}
     )
     page = fields.Integer(
         required=True,
-        error_messages={'required': {'message': 'Page required'}}
+        error_messages={'required': 'Page required'}
     )
 
 

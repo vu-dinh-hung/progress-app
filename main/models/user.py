@@ -17,14 +17,6 @@ class User(db.Model):
         return f'<User(id={self.id}, username={self.username}, name={self.name}, ' +\
             f'status={self.status}, created_at={self.created_at}, updated_at={self.updated_at})>'
 
-    def __eq__(self, o: object) -> bool:
-        if not isinstance(o, User): return False
-        if self.id != o.id: return False
-        if self.username != o.username: return False
-        if self.name != o.name: return False
-        if self.password_hash != o.password_hash: return False
-        return True
-
     @classmethod
     def find_by_username(cls, username):
         """Return the user with the given username
@@ -40,6 +32,7 @@ class UserSchema(BaseSchema):
 
 class NewUserSchema(Schema):
     min_username, max_username = 4, 30
+
     username = fields.String(
         required=True,
         load_only=True,
@@ -49,13 +42,13 @@ class NewUserSchema(Schema):
                 error=f'Username must be between {min_username} and {max_username} characters'
             )
         ],
-        error_messages={'required': {'message': 'Username required'}}
+        error_messages={'required': 'Username required'}
     )
     password = fields.String(
         required=True,
         load_only=True,
         validate=[validate.Length(min=8, error='Password must be at least 8 characters')],
-        error_messages={'required': {'message': 'Username required'}}
+        error_messages={'required': 'Password required'}
     )
     name = fields.String()
 
@@ -72,8 +65,12 @@ class NewUserSchema(Schema):
 
 
 class LoginSchema(Schema):
-    username = fields.String(required=True, load_only=True)
-    password = fields.String(required=True, load_only=True)
+    username = fields.String(
+        required=True, load_only=True, error_messages={'required': 'Username required'}
+    )
+    password = fields.String(
+        required=True, load_only=True, error_messages={'required': 'Password required'}
+    )
 
     @validates_schema
     def check_credentials(self, data, **kwargs):

@@ -17,14 +17,6 @@ class Log(db.Model):
         return f'<Log(habit_id={self.habit_id}, date={self.date}, count={self.count}, ' +\
             f'id={self.id}, created_at={self.created_at}, updated_at={self.updated_at})>'
 
-    def __eq__(self, o: object) -> bool:
-        if not isinstance(o, Log): return False
-        if self.id != o.id: return False
-        if self.habit_id != o.habit_id: return False
-        if self.date != o.date: return False
-        if self.count != o.count: return False
-        return True
-
     @classmethod
     def get_by_habit_in_month(cls, habit_id, year, month):
         return cls.query.filter_by(habit_id=habit_id).filter(extract('year', Log.date)==year).filter(extract('month', Log.date)==month).all()
@@ -50,7 +42,7 @@ class NewLogSchema(Schema):
     date = fields.Date(
         required=True,
         load_only=True,
-        error_messages={'required': {'message': 'Habit name required'}}
+        error_messages={'required': 'Date required'}
     )
 
 
