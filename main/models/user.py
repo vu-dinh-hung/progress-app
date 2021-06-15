@@ -59,6 +59,17 @@ class NewUserSchema(Schema):
     )
     name = fields.String()
 
+    @validates_schema
+    def check_credentials(self, data, **kwargs):
+        errors = {}
+
+        user = User.find_by_username(data['username'])
+        if user:
+            errors['username'] = ['Username already exist']
+
+        if errors:
+            raise ValidationError(errors)
+
 
 class LoginSchema(Schema):
     username = fields.String(required=True, load_only=True)
