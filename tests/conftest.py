@@ -1,20 +1,41 @@
 import datetime
+import json
 import pytest
+import bcrypt
 from main import create_app, db
 from main.models.user import User
 from main.models.habit import Habit
 from main.models.log import Log
 
 
-@pytest.fixture(scope='session', autouse=True)
-def app_context():
+# @pytest.fixture(scope='session', autouse=True)
+# def app_context():
+#     """Setup & teardown app"""
+#     app = create_app('testing')
+#     with app.app_context() as ctx:
+#         yield ctx
+
+
+@pytest.fixture(scope='session')
+def app():
     """Setup & teardown app"""
     app = create_app('testing')
+    return app
+
+
+@pytest.fixture(scope='session', autouse=True)
+def app_context(app):
+    """Setup & teardown app_context"""
     with app.app_context() as ctx:
         yield ctx
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
+def client(app):
+    return app.test_client()
+
+
+@pytest.fixture(autouse=True)
 def db_empty():
     """Empty the test db"""
     db.session.close()  # this line is to suppress the warning: "SAWarning: Identity map already had an identity for <model>,
@@ -28,9 +49,8 @@ def db_empty():
 def db_populated(db_empty, users_in_db_getter, habits_in_db_getter):
     """Add test data to db"""
     test_user_dicts = (
-        {'username': 'testuser0', 'password_hash': 'testHash', 'name': 'Luke Cage'},
-        {'username': 'testuser1', 'password_hash': 'anotherTestHash', 'name': 'Barry Allen'},
-        {'username': 'a', 'password_hash': 'yetanotherHash'}
+        {'username': 'testuser0', 'password': 'p4ssw0rd', 'name': 'Main Tester'},
+        {'username': 'testuser1', 'password': 'p4ssw0rd1'}
     )
     test_habit_dicts = (
         {'name': 'run', 'countable': True},
@@ -42,7 +62,11 @@ def db_populated(db_empty, users_in_db_getter, habits_in_db_getter):
     )
 
     for user_dict in test_user_dicts:
-        user = User(**user_dict)
+        password_hash = bcrypt.hashpw(user_dict['password'].encode('utf-8'), bcrypt.gensalt(10))
+        data = user_dict.copy()
+        data.pop('password')
+        data['password_hash'] = password_hash
+        user = User(**data)
         db.session.add(user)
     db.session.commit()
 
@@ -56,7 +80,22 @@ def db_populated(db_empty, users_in_db_getter, habits_in_db_getter):
         db.session.add(log)
     db.session.commit()
 
-    return (test_user_dicts, test_habit_dicts, test_log_dicts)
+    return {
+        'user_dicts': test_user_dicts,
+        'habit_dicts': test_habit_dicts,
+        'log_dicts': test_log_dicts
+    }
+
+
+@pytest.fixture()
+def jwt_user_0(client, db_populated):
+    """Return JWT for main tester user"""
+    user_dict = db_populated['user_dicts'][0]
+    res = client.post('/api/login', data=json.dumps({
+        'username': user_dict['username'],
+        'password': user_dict['password']
+    }))
+    return res.json['access_token']
 
 
 @pytest.fixture(scope='session')
