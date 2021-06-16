@@ -91,7 +91,6 @@ def test_get_user(client, db_populated, users_in_db_getter, jwt_user_0):
     assert res.json.get('name') == users[0].name
 
 
-
 def test_get_user_errors(client, db_populated, users_in_db_getter, jwt_user_0):
     """Test that without proper auth, user GET fails correctly"""
     users = users_in_db_getter()
@@ -103,3 +102,37 @@ def test_get_user_errors(client, db_populated, users_in_db_getter, jwt_user_0):
     # fails with 404 if id or user being fetched does not match id of JWT
     res = client.get(f'/api/users/{users[1].id}', headers={'Authorization': f'Bearer {jwt_user_0}'})
     assert res.status_code == 404
+
+
+@pytest.mark.parametrize('user_data', [
+    pytest.param({'password': 'newpassword'}, id='without name'),
+    pytest.param({'password': 'newpassword2', 'name': 'Test'}, id='with name')
+])
+def test_put_user(client, db_populated, users_in_db_getter, jwt_user_0, login, user_data):
+    """Test that users can be PUT correctly with valid data"""
+    users_before = users_in_db_getter()
+
+    res = client.put(f'/api/users/{users_before[0].id}', data=json.dumps(user_data), headers={'Authorization': f'Bearer {jwt_user_0}'})
+    users_after = users_in_db_getter()
+
+    assert res.status_code == 200
+    assert len(users_after) == len(users_before)
+    assert res.json['name'] == user_data.get('name', users_before[0].name)
+    assert login(res.json['username'], user_data['password'])
+
+
+@pytest.mark.parametrize('user_data, invalid_field', [
+    pytest.param({'password': 'white space'}, 'password', id='white space password'),
+    pytest.param({'password': 'short', 'name': 'Test'}, 'password', id='short password'),
+    pytest.param({'username': 'newusername'}, 'username', id='new username'),
+])
+def test_put_user_errors(client, db_populated, users_in_db_getter, jwt_user_0, user_data, invalid_field):
+    """Test that users can be PUT correctly with valid data"""
+    users_before = users_in_db_getter()
+
+    res = client.put(f'/api/users/{users_before[0].id}', data=json.dumps(user_data), headers={'Authorization': f'Bearer {jwt_user_0}'})
+    users_after = users_in_db_getter()
+
+    assert res.status_code == 400
+    assert len(users_after) == len(users_before)
+    assert res.json['data'].get(invalid_field)

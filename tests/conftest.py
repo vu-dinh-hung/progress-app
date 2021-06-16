@@ -62,7 +62,7 @@ def db_populated(db_empty, users_in_db_getter, habits_in_db_getter):
     )
 
     for user_dict in test_user_dicts:
-        password_hash = bcrypt.hashpw(user_dict['password'].encode('utf-8'), bcrypt.gensalt(10))
+        password_hash = bcrypt.hashpw(user_dict['password'].encode('utf-8'), bcrypt.gensalt(8))
         data = user_dict.copy()
         data.pop('password')
         data['password_hash'] = password_hash
@@ -96,6 +96,19 @@ def jwt_user_0(client, db_populated):
         'password': user_dict['password']
     }))
     return res.json['access_token']
+
+
+@pytest.fixture()
+def login(client, db_populated):
+    """Return a login function for a username-password pair"""
+    def login(username, password):
+        res = client.post('/api/login', data=json.dumps({
+            'username': username,
+            'password': password
+        }))
+        return res.json
+
+    return login
 
 
 @pytest.fixture(scope='session')
