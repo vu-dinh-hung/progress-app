@@ -6,27 +6,37 @@ from main.db import db
 
 class Log(db.Model):
     """Log Model for 'logs' table"""
-    __tablename__ = 'logs'
 
-    habit_id = db.Column(db.Integer, db.ForeignKey('habits.id'), nullable=False)
+    __tablename__ = "logs"
+
+    habit_id = db.Column(db.Integer, db.ForeignKey("habits.id"), nullable=False)
     date = db.Column(db.Date, nullable=False)
     count = db.Column(db.Integer, nullable=True)  # defaults to NULL
 
     def __repr__(self) -> str:
-        return f'<Log(habit_id={self.habit_id}, date={self.date}, count={self.count}, ' +\
-            f'id={self.id}, created_at={self.created_at}, updated_at={self.updated_at})>'
+        return (
+            f"<Log(habit_id={self.habit_id}, date={self.date}, count={self.count}, "
+            + f"id={self.id}, created_at={self.created_at}, updated_at={self.updated_at})>"
+        )
 
     @classmethod
     def get_by_habit_in_month(cls, habit_id, year, month):
-        return cls.query.filter_by(habit_id=habit_id).filter(extract('year', Log.date)==year).filter(extract('month', Log.date)==month).all()
-
+        """Return logs for the given habit_id in the given month"""
+        return (
+            cls.query.filter_by(habit_id=habit_id)
+            .filter(extract("year", Log.date) == year)
+            .filter(extract("month", Log.date) == month)
+            .all()
+        )
 
     @classmethod
     def get_one(cls, **kwargs):
+        """Return a log for the given conditions"""
         return cls.query.filter_by(**kwargs).first()
 
-    @validates('date')
+    @validates("date")
     def validate_updated_at(self, key, value):
+        """SQLAlchemy validator for date field"""
         if self.date:
-            raise ValueError('Cannot update date')
+            raise ValueError("Cannot update date")
         return value

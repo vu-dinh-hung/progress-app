@@ -1,4 +1,4 @@
-'''Module for initializing the Flask application'''
+"""Module for initializing the Flask application"""
 import logging
 from flask import Flask, request
 from flask_jwt_extended import JWTManager
@@ -14,6 +14,7 @@ jwt = JWTManager()
 
 
 def create_app(config_name):
+    """Return initialized and configured Flask app"""
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     db.init_app(app)
@@ -21,21 +22,27 @@ def create_app(config_name):
 
     # set up logging
     level = logging.INFO
-    if config_name == 'development': level = logging.DEBUG
-    if config_name == 'testing': level = logging.CRITICAL
+    if config_name == "development":
+        level = logging.DEBUG
+    if config_name == "testing":
+        level = logging.CRITICAL
     logger.setLevel(level)
 
     @app.after_request
     def log_request(response):
         logger.info(
-            f'{request.remote_addr} {request.method} {request.full_path} : {response.status}'
+            "%s %s %s : %s",
+            request.remote_addr,
+            request.method,
+            request.full_path,
+            response.status,
         )
         return response
 
     app.register_error_handler(500, handle_exceptions)
 
     # routes
-    prefix = '/api'
+    prefix = "/api"
     app.register_blueprint(user_router, url_prefix=prefix)
     app.register_blueprint(habit_router, url_prefix=prefix)
     app.register_blueprint(log_router, url_prefix=prefix)

@@ -1,5 +1,6 @@
-import pytest
+"""Test module for log model"""
 import datetime
+import pytest
 from sqlalchemy.exc import IntegrityError
 from main.models.log import Log
 
@@ -54,19 +55,20 @@ def test_log_update(db_populated, logs_in_db_getter):
     updated_at_before = updated_log.updated_at
 
     updated_log.count = 14
-    updated_log.status = 'deleted'
+    updated_log.status = "deleted"
     updated_log.save()
 
     logs_after = logs_in_db_getter()
     created_at_after = updated_log.created_at
     updated_at_after = updated_log.updated_at
-    updated_log_in_db = list(filter(lambda h : h.id == updated_log.id, logs_after))[0]
+    updated_log_in_db = list(filter(lambda h: h.id == updated_log.id, logs_after))[0]
 
     assert len(logs_after) == len(logs_before)
     assert created_at_before == created_at_after
     assert updated_at_before < updated_at_after
     assert updated_log_in_db.count == updated_log.count
     assert updated_log_in_db.status == updated_log.status
+
 
 def test_habit_update_errors(db_populated, logs_in_db_getter):
     """Test that invalid log data are not updated"""

@@ -1,7 +1,11 @@
+"""Test module for base model"""
 from datetime import datetime
 import pytest
 
-def test_protected_fields(db_populated, users_in_db_getter, habits_in_db_getter, logs_in_db_getter):
+
+def test_protected_fields(
+    db_populated, users_in_db_getter, habits_in_db_getter, logs_in_db_getter
+):
     """Test that forbidden fields are not manually updated"""
     users = users_in_db_getter()
     habits = habits_in_db_getter()

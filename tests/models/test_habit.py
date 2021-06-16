@@ -1,3 +1,4 @@
+"""Test module for habit model"""
 import pytest
 from sqlalchemy.exc import IntegrityError
 from main.models.habit import Habit
@@ -7,7 +8,7 @@ def test_habit_create(db_populated, users_in_db_getter, habits_in_db_getter):
     """Test that valid habits are created correctly"""
     habits_before = habits_in_db_getter()
     users = users_in_db_getter()
-    new_habit = Habit(name='code', user_id=users[1].id)
+    new_habit = Habit(name="code", user_id=users[1].id)
     new_habit.save()
     habits_after = habits_in_db_getter()
     new_habit_in_db = [habit for habit in habits_after if habit not in habits_before][0]
@@ -28,7 +29,7 @@ def test_habit_create_errors(db_populated, users_in_db_getter, habits_in_db_gett
         missing_name.save()
 
     with pytest.raises(IntegrityError):
-        missing_user_id = Habit(name='habitwithoutuserid')
+        missing_user_id = Habit(name="habitwithoutuserid")
         missing_user_id.save()
 
     habits_after = habits_in_db_getter()
@@ -52,20 +53,23 @@ def test_habit_update(db_populated, habits_in_db_getter):
     created_at_before = updated_habit.created_at
     updated_at_before = updated_habit.updated_at
 
-    updated_habit.name = 'newnamefromtest'
-    updated_habit.status = 'deleted'
+    updated_habit.name = "newnamefromtest"
+    updated_habit.status = "deleted"
     updated_habit.save()
 
     habits_after = habits_in_db_getter()
     created_at_after = updated_habit.created_at
     updated_at_after = updated_habit.updated_at
-    updated_habit_in_db = list(filter(lambda h : h.id == updated_habit.id, habits_after))[0]
+    updated_habit_in_db = list(
+        filter(lambda h: h.id == updated_habit.id, habits_after)
+    )[0]
 
     assert len(habits_after) == len(habits_before)
     assert created_at_before == created_at_after
     assert updated_at_before < updated_at_after
     assert updated_habit_in_db.status == updated_habit.status
     assert updated_habit_in_db.name == updated_habit.name
+
 
 def test_habit_update_errors(db_populated, habits_in_db_getter):
     """Test that invalid habit data are not updated"""
