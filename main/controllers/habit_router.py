@@ -21,7 +21,7 @@ def get_habits(user_id):
         return {
             'message': 'Invalid query parameters',
             'data': errors
-        }
+        }, 400
 
     query_params = get_habit_query_params_schema.load(request.args)
     habits_per_page = 20
