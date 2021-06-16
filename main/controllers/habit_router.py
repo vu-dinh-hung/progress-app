@@ -37,7 +37,7 @@ def get_habits(user_id):
         )
 
     return {
-        "total_habits": Habit.get_habit_count(),
+        "total_habits": Habit.get_habit_count(user_id),
         "habits_per_page": habits_per_page,
         "habits": habits_schema.dump(habits),
     }, 200

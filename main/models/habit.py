@@ -20,9 +20,9 @@ class Habit(db.Model):
         )
 
     @classmethod
-    def get_habit_count(cls):
+    def get_habit_count(cls, user_id):
         """Return count of all habits owned by user"""
-        return cls.query.count()
+        return cls.query.filter_by(user_id=user_id).count()
 
     @classmethod
     def get_in_month_paginated(cls, *args):
