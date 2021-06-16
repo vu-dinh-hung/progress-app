@@ -58,7 +58,7 @@ def db_populated(db_empty, users_in_db_getter, habits_in_db_getter):
     )
     test_log_dicts = (
         {'date': datetime.date(2021, 6, 2), 'count': 12},
-        {'date': datetime.date(2021, 6, 3)}
+        {'date': datetime.date(2021, 6, 3), 'count': 13}
     )
 
     for user_dict in test_user_dicts:
