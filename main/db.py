@@ -4,6 +4,7 @@ from contextlib import contextmanager
 from flask_sqlalchemy import Model, SQLAlchemy
 import sqlalchemy as sa
 from sqlalchemy.orm import validates
+from sqlalchemy.dialects.mysql import DATETIME
 from marshmallow import Schema, fields, validate
 
 
@@ -23,10 +24,10 @@ class Base(Model):
     """Base class for all Models"""
     id = sa.Column(sa.Integer, primary_key=True)
     created_at = sa.Column(
-        sa.DateTime, default=datetime.utcnow, nullable=False
+        DATETIME(fsp=6), default=datetime.utcnow, nullable=False
     )
     updated_at = sa.Column(
-        sa.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+        DATETIME(fsp=6), default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
     )
     status = sa.Column(sa.String(32), default='active', nullable=False)
 

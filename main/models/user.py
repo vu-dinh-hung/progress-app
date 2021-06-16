@@ -31,7 +31,7 @@ class User(db.Model):
 
     def check_password(self, password):
         """Compare the given password with the user's password_hash"""
-        return bcrypt.checkpw(password.encode('utf-8'), self.password_hash)
+        return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
 
 
 def validate_password(password):
