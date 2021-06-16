@@ -1,12 +1,9 @@
 """Module for user_router blueprint"""
 from flask import Blueprint, request
-from flask_jwt_extended import (
-    jwt_required,
-    get_jwt_identity,
-    create_access_token
-)
+from flask_jwt_extended import create_access_token
 from main.models.user import User
 from main.schemas.user_schema import user_schema, new_user_schema, login_schema
+from main.utils.decorators import jwt_required_verify_user
 
 user_router = Blueprint('user_router', __name__)
 
@@ -54,12 +51,8 @@ def post_user():
 
 
 @user_router.route('/users/<user_id>', methods=['GET'])
-@jwt_required()
+@jwt_required_verify_user()
 def get_user(user_id):
-    jwt_id = get_jwt_identity()
-    if user_id != str(jwt_id):
-        return {'message': 'User not found'}, 404
-
     user = User.find_by_id(user_id)
     if user:
         return user_schema.dump(user), 200
@@ -68,12 +61,8 @@ def get_user(user_id):
 
 
 @user_router.route('/users/<user_id>', methods=['PUT'])
-@jwt_required()
+@jwt_required_verify_user()
 def put_user(user_id):
-    jwt_id = get_jwt_identity()
-    if user_id != str(jwt_id):
-        return {'message': 'User not found'}, 404
-
     body = request.get_json(force=True)
     errors = user_schema.validate(body)
     if errors:

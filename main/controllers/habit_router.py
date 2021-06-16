@@ -1,10 +1,12 @@
 """Module for habit_router blueprint"""
 from flask import Blueprint, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
 from main.models.habit import Habit
 from main.models.log import Log
 from main.schemas.habit_schema import (
     habit_schema, habits_schema, new_habit_schema, get_habit_query_params_schema
+)
+from main.utils.decorators import (
+    jwt_required_verify_user, jwt_required_verify_user_and_habit
 )
 
 habit_router = Blueprint('habit_router', __name__)
@@ -12,12 +14,8 @@ base_url = '/users/<user_id>/habits'
 
 
 @habit_router.route(base_url, methods=['GET'])
-@jwt_required()
+@jwt_required_verify_user()
 def get_habits(user_id):
-    jwt_id = get_jwt_identity()
-    if user_id != str(jwt_id):
-        return {'message': 'User not found'}, 404
-
     errors = get_habit_query_params_schema.validate(request.args)
     if errors:
         return {
@@ -44,12 +42,8 @@ def get_habits(user_id):
 
 
 @habit_router.route(base_url, methods=['POST'])
-@jwt_required()
+@jwt_required_verify_user()
 def post_habit(user_id):
-    jwt_id = get_jwt_identity()
-    if user_id != str(jwt_id):
-        return {'message': 'User not found'}, 404
-
     body = request.get_json(force=True)
     errors = new_habit_schema.validate(body)
     if errors:
@@ -66,16 +60,8 @@ def post_habit(user_id):
 
 
 @habit_router.route(f'{base_url}/<habit_id>', methods=['PUT'])
-@jwt_required()
+@jwt_required_verify_user_and_habit()
 def put_habit(user_id, habit_id):
-    jwt_id = get_jwt_identity()
-    if user_id != str(jwt_id):
-        return {'message': 'User not found'}, 404
-
-    habit = Habit.find_by_id(habit_id)
-    if not habit or user_id != str(habit.user_id):
-        return {'message': 'Habit not found'}, 404
-
     body = request.get_json(force=True)
     errors = habit_schema.validate(body)
     if errors:
