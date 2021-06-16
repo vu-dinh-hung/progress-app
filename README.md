@@ -25,10 +25,10 @@ Use [pip](https://pip.pypa.io/en/stable/) to install the dependencies.
 pip install -r requirements.txt
 ```
 
-Then, add a `.env` file containing the following fields:
+Then, add to the root of the project a `.env` file containing the following fields:
 
 ```bash
-PORT=<your_port>
+FLASK_RUN_PORT=<your_port>
 DATABASE_URL=<your_database_url>
 DEV_DATABASE_URL=<your_development_database_url>
 TEST_DATABASE_URL=<your_test_database_url>
