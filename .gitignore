@@ -13,5 +13,6 @@ db_dev.sqlite
 .env
 
 # misc
+app.log*
 .vscode
 .DS_Store
