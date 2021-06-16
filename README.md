@@ -35,6 +35,8 @@ TEST_DATABASE_URL=<your_test_database_url>
 SECRET_KEY=<your_secret_key_for_security_stuff>
 ```
 
+If you need to initialize your database, use the script `db_init.py`.
+
 ## Run
 
 For development, simply run:
