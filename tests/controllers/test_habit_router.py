@@ -1,6 +1,5 @@
 import pytest
 import json
-from main.models.habit import Habit
 
 
 @pytest.mark.parametrize('habit_data', [
@@ -53,7 +52,6 @@ def test_put_habit(client, db_populated, users_in_db_getter, habits_in_db_getter
     res = client.put(f'/api/users/{users[0].id}/habits/{habits_before[0].id}', data=json.dumps(habit_data), headers={'Authorization': f'Bearer {jwt_user_0}'})
 
     habits_after = habits_in_db_getter()
-    habit = Habit.find_by_id(habits_before[0].id)
 
     assert res.status_code == 200
     assert len(habits_after) == len(habits_before)
