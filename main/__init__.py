@@ -20,7 +20,10 @@ def create_app(config_name):
     jwt.init_app(app)
 
     # set up logging
-    logger.setLevel(logging.DEBUG if config_name == 'development' else logging.INFO)
+    level = logging.INFO
+    if config_name == 'development': level = logging.DEBUG
+    if config_name == 'testing': level = logging.CRITICAL
+    logger.setLevel(level)
 
     @app.after_request
     def log_request(response):
