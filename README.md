@@ -2,6 +2,21 @@
 
 This is a little web app I am building in my spare time to keep track of my habits.
 
+## Pre-setup
+
+To download a local copy of this project, do:
+
+```bash
+git clone https://github.com/vu-dinh-hung/progress-app.git
+```
+
+This project requires Python 3.9. To create a virtual environment for running the project, install Python 3.9 and [virtualenv](https://pypi.org/project/virtualenv/), then do:
+
+```bash
+virtualenv env -p python3.9
+```
+
+
 ## Setup
 
 Use [pip](https://pip.pypa.io/en/stable/) to install the dependencies.
