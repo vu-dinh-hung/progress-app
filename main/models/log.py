@@ -47,7 +47,12 @@ class NewLogSchema(Schema):
 
 
 class NewLogWithCountSchema(NewLogSchema):
-    count = fields.Integer(strict=True, load_only=True)
+    count = fields.Integer(
+        required=True,
+        strict=True,
+        load_only=True,
+        error_messages={'required': 'Count required'}
+    )
 
 
 log_schema = LogSchema()
