@@ -5,7 +5,8 @@ from flask_jwt_extended import (
     get_jwt_identity,
     create_access_token
 )
-from main.models.user import User, user_schema, new_user_schema, login_schema
+from main.models.user import User
+from main.schemas.user_schema import user_schema, new_user_schema, login_schema
 
 user_router = Blueprint('user_router', __name__)
 

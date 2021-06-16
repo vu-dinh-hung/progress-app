@@ -2,7 +2,8 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from main.models.habit import Habit
-from main.models.log import Log, log_schema, new_log_schema, new_log_with_count_schema
+from main.models.log import Log
+from main.schemas.log_schema import log_schema, new_log_schema, new_log_with_count_schema
 
 log_router = Blueprint('log_router', __name__)
 base_url = '/users/<user_id>/habits/<habit_id>'

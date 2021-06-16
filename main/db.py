@@ -5,7 +5,6 @@ from flask_sqlalchemy import Model, SQLAlchemy
 import sqlalchemy as sa
 from sqlalchemy.orm import validates
 from sqlalchemy.dialects.mysql import DATETIME
-from marshmallow import Schema, fields, validate
 
 
 @contextmanager
@@ -65,11 +64,6 @@ class Base(Model):
         """Add/update this resource in the database"""
         with session_scope() as session:
             session.add(self)
-
-
-class BaseSchema(Schema):
-    id = fields.Int(dump_only=True)
-    status = fields.String(load_only=True, validate=[validate.OneOf(('active', 'deleted'))])
 
 
 db = SQLAlchemy(model_class=Base)

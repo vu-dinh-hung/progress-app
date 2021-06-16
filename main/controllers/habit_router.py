@@ -1,8 +1,11 @@
 """Module for habit_router blueprint"""
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from main.models.habit import Habit, habit_schema, habits_schema, new_habit_schema, get_habit_query_params_schema
+from main.models.habit import Habit
 from main.models.log import Log
+from main.schemas.habit_schema import (
+    habit_schema, habits_schema, new_habit_schema, get_habit_query_params_schema
+)
 
 habit_router = Blueprint('habit_router', __name__)
 base_url = '/users/<user_id>/habits'
