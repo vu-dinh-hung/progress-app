@@ -18,8 +18,6 @@ BASE_URL = "/users/<user_id>/habits/<habit_id>"
 def post_log(user_id, habit_id):
     """POST log"""
     habit = HabitEngine.find_by_id(habit_id)
-    if not habit or user_id != str(habit.user_id):
-        return {"message": "Habit not found"}, 404
 
     # load log schema according to countability of habit
     schema = new_log_with_count_schema if habit.countable else new_log_schema
@@ -50,10 +48,6 @@ def post_log(user_id, habit_id):
 @jwt_required_verify_user_and_habit()
 def put_log(user_id, habit_id, log_id):
     """PUT log"""
-    habit = HabitEngine.find_by_id(habit_id)
-    if not habit or user_id != str(habit.user_id):
-        return {"message": "Habit not found"}, 404
-
     log = LogEngine.find_by_id(log_id)
     if not log or habit_id != str(log.habit_id):
         return {"message": "Log not found"}, 404
