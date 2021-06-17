@@ -1,4 +1,5 @@
 """Test module for user model"""
+# pylint: disable=unused-argument
 import pytest
 from sqlalchemy.exc import IntegrityError
 from main.models.user import User

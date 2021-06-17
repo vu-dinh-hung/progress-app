@@ -1,4 +1,5 @@
 """Test module for log model"""
+# pylint: disable=unused-argument
 import datetime
 import pytest
 from sqlalchemy.exc import IntegrityError

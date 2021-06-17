@@ -63,7 +63,7 @@ def post_habit(user_id):
 
 @habit_router.route(f"{BASE_URL}/<habit_id>", methods=["PUT"])
 @jwt_required_verify_user_and_habit()
-def put_habit(user_id, habit_id):
+def put_habit(user_id, habit_id):  # pylint: disable=unused-argument
     """PUT habit"""
     body = request.get_json(force=True)
     errors = habit_schema.validate(body)

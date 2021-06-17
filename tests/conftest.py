@@ -1,4 +1,5 @@
 """Setup module for pytest"""
+# pylint: disable=unused-argument
 import datetime
 import json
 import pytest
@@ -7,14 +8,6 @@ from main import create_app, db
 from main.models.user import User
 from main.models.habit import Habit
 from main.models.log import Log
-
-
-# @pytest.fixture(scope='session', autouse=True)
-# def app_context():
-#     """Setup & teardown app"""
-#     app = create_app('testing')
-#     with app.app_context() as ctx:
-#         yield ctx
 
 
 @pytest.fixture(scope="session")

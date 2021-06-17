@@ -1,4 +1,5 @@
 """Test module for habit model"""
+# pylint: disable=unused-argument
 import pytest
 from sqlalchemy.exc import IntegrityError
 from main.models.habit import Habit

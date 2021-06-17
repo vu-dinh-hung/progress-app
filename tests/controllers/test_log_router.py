@@ -1,4 +1,5 @@
 """Test module for log_router"""
+# pylint: disable=unused-argument
 import json
 import pytest
 

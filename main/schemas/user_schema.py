@@ -22,7 +22,9 @@ class UserSchema(BaseSchema):
     password = fields.String(load_only=True, validate=[validate_password])
 
     @post_load
-    def make_password_hash(self, data, **kwargs):  # pylint: disable=no-self-use
+    def make_password_hash(
+        self, data, **kwargs
+    ):  # pylint: disable=no-self-use,unused-argument
         """Replace password with password_hash on deserialization"""
         if data.get("password"):
             data["password_hash"] = hash_password(data["password"])
@@ -58,14 +60,16 @@ class NewUserSchema(Schema):
     @validates("username")
     def check_duplicate_username(
         self, username, **kwargs
-    ):  # pylint: disable=no-self-use
+    ):  # pylint: disable=no-self-use,unused-argument
         """Validator for duplicate username"""
         user = UserEngine.find_by_username(username)
         if user:
             raise ValidationError("Username already exist")
 
     @post_load
-    def make_password_hash(self, data, **kwargs):  # pylint: disable=no-self-use
+    def make_password_hash(
+        self, data, **kwargs
+    ):  # pylint: disable=no-self-use,unused-argument
         """Replace password with password_hash on deserialization"""
         data["password_hash"] = hash_password(data["password"])
         data.pop("password")

@@ -4,4 +4,4 @@ repos:
     hooks:
     - id: pylint
       args:
-      - --disable=import-error,redefined-outer-name,unused-argument,too-few-public-methods,too-many-arguments
+      - --disable=import-error,redefined-outer-name,too-few-public-methods,too-many-arguments

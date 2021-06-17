@@ -15,7 +15,7 @@ BASE_URL = "/users/<user_id>/habits/<habit_id>"
 
 @log_router.route(f"{BASE_URL}/logs", methods=["POST"])
 @jwt_required_verify_user_and_habit()
-def post_log(user_id, habit_id):
+def post_log(user_id, habit_id):  # pylint: disable=unused-argument
     """POST log"""
     habit = HabitEngine.find_by_id(habit_id)
 
@@ -46,7 +46,7 @@ def post_log(user_id, habit_id):
 
 @log_router.route(f"{BASE_URL}/logs/<log_id>", methods=["PUT"])
 @jwt_required_verify_user_and_habit()
-def put_log(user_id, habit_id, log_id):
+def put_log(user_id, habit_id, log_id):  # pylint: disable=unused-argument
     """PUT log"""
     log = LogEngine.find_by_id(log_id)
     if not log or habit_id != str(log.habit_id):
