@@ -22,7 +22,7 @@ class Log(db.Model):
     def get_by_habit_in_month(cls, habit_id, year, month):
         """Return logs for the given habit_id in the given month"""
         return (
-            cls.query.filter_by(habit_id=habit_id)
+            cls.query.filter_by(habit_id=habit_id, status="active")
             .filter(extract("year", Log.date) == year)
             .filter(extract("month", Log.date) == month)
             .all()
