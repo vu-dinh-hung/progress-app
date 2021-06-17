@@ -69,15 +69,3 @@ def test_habit_update(db_populated, habits_in_db_getter):
     assert updated_at_before < updated_at_after
     assert updated_habit_in_db.status == updated_habit.status
     assert updated_habit_in_db.name == updated_habit.name
-
-
-def test_habit_update_errors(db_populated, habits_in_db_getter):
-    """Test that invalid habit data are not updated"""
-    habits_before = habits_in_db_getter()
-
-    change_countable = habits_before[0]
-    with pytest.raises(ValueError):
-        change_countable.countable = not change_countable.countable
-        change_countable.save()
-
-    assert len(habits_in_db_getter()) == len(habits_before)

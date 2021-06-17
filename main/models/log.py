@@ -1,5 +1,4 @@
 """Module for Log model"""
-from sqlalchemy.orm import validates
 from sqlalchemy import extract
 from main.db import db
 
@@ -31,12 +30,5 @@ class Log(db.Model):
 
     @classmethod
     def get_one(cls, **kwargs):
-        """Return a log for the given conditions"""
+        """Return a log with fields matching for the given kwargs"""
         return cls.query.filter_by(**kwargs).first()
-
-    @validates("date")
-    def validate_updated_at(self, key, value):
-        """SQLAlchemy validator for date field"""
-        if self.date:
-            raise ValueError("Cannot update date")
-        return value

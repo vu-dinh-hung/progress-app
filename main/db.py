@@ -3,7 +3,6 @@ from datetime import datetime
 from contextlib import contextmanager
 from flask_sqlalchemy import Model, SQLAlchemy
 import sqlalchemy as sa
-from sqlalchemy.orm import validates
 from sqlalchemy.dialects.mysql import DATETIME
 
 
@@ -31,27 +30,6 @@ class Base(Model):
         nullable=False,
     )
     status = sa.Column(sa.String(32), default="active", nullable=False)
-
-    @validates("id")
-    def validate_id(self, key, value):
-        """Validator for id field"""
-        if self.id:
-            raise ValueError("Cannot update id")
-        return value
-
-    @validates("created_at")
-    def validate_created_at(self, key, value):
-        """Validator for created_at field"""
-        if self.created_at:
-            raise ValueError("Cannot update created_at")
-        return value
-
-    @validates("updated_at")
-    def validate_updated_at(self, key, value):
-        """Validator for updated_at field"""
-        if self.updated_at:
-            raise ValueError("Cannot update created_at")
-        return value
 
     @classmethod
     def find_by_id(cls, _id):

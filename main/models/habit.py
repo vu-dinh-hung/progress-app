@@ -1,5 +1,4 @@
 """Module for Habit model"""
-from sqlalchemy.orm import validates
 from main.db import db
 
 
@@ -34,10 +33,3 @@ class Habit(db.Model):
             .items
         )
         return habits
-
-    @validates("countable")
-    def validate_countable(self, key, value):
-        """SQLAlchemy validator for countable field"""
-        if self.countable:
-            raise ValueError("Cannot update field: countable")
-        return value

@@ -68,15 +68,3 @@ def test_log_update(db_populated, logs_in_db_getter):
     assert updated_at_before < updated_at_after
     assert updated_log_in_db.count == updated_log.count
     assert updated_log_in_db.status == updated_log.status
-
-
-def test_habit_update_errors(db_populated, logs_in_db_getter):
-    """Test that invalid log data are not updated"""
-    logs_before = logs_in_db_getter()
-
-    change_date = logs_before[0]
-    with pytest.raises(ValueError):
-        change_date.date = datetime.date(2000, 1, 1)
-        change_date.save()
-
-    assert len(logs_in_db_getter()) == len(logs_before)
