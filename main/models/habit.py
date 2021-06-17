@@ -17,19 +17,3 @@ class Habit(db.Model):
             + f"countable={self.countable}, status={self.status}, "
             + f"created_at={self.created_at}, updated_at={self.updated_at})>"
         )
-
-    @classmethod
-    def get_habit_count(cls, user_id):
-        """Return count of all habits owned by user"""
-        return cls.query.filter_by(user_id=user_id, status="active").count()
-
-    @classmethod
-    def get_paginated(cls, user_id, *args):
-        """Return a paginated list of habits"""
-        habits = (
-            cls.query.filter_by(user_id=user_id, status="active")
-            .order_by(cls.created_at.desc())
-            .paginate(*args)
-            .items
-        )
-        return habits
