@@ -1,7 +1,7 @@
 """Module for log_router blueprint"""
 from flask import Blueprint, request
-from main.models.habit import Habit
-from main.models.log import Log
+from main.engines.habit import HabitEngine
+from main.engines.log import LogEngine
 from main.schemas.log_schema import (
     log_schema,
     new_log_schema,
@@ -17,7 +17,7 @@ BASE_URL = "/users/<user_id>/habits/<habit_id>"
 @jwt_required_verify_user_and_habit()
 def post_log(user_id, habit_id):
     """POST log"""
-    habit = Habit.find_by_id(habit_id)
+    habit = HabitEngine.find_by_id(habit_id)
     if not habit or user_id != str(habit.user_id):
         return {"message": "Habit not found"}, 404
 
@@ -32,7 +32,7 @@ def post_log(user_id, habit_id):
     log_data = schema.load(body)
 
     # if log for given date and habit already exist, set status of that log to 'active'
-    log_in_db = Log.get_one(habit_id=habit_id, date=log_data["date"])
+    log_in_db = LogEngine.get_log_by_habit_and_date(habit_id, log_data["date"])
     log = None
     if log_in_db:
         print("found matching log")
@@ -40,7 +40,7 @@ def post_log(user_id, habit_id):
         log_in_db.save()
         log = log_in_db
     else:
-        log = Log(**log_data, habit_id=int(habit_id))
+        log = LogEngine.create_log(**log_data, habit_id=int(habit_id))
         log.save()
 
     return log_schema.dump(log), 201
@@ -50,11 +50,11 @@ def post_log(user_id, habit_id):
 @jwt_required_verify_user_and_habit()
 def put_log(user_id, habit_id, log_id):
     """PUT log"""
-    habit = Habit.find_by_id(habit_id)
+    habit = HabitEngine.find_by_id(habit_id)
     if not habit or user_id != str(habit.user_id):
         return {"message": "Habit not found"}, 404
 
-    log = Log.find_by_id(log_id)
+    log = LogEngine.find_by_id(log_id)
     if not log or habit_id != str(log.habit_id):
         return {"message": "Log not found"}, 404
 
@@ -64,7 +64,7 @@ def put_log(user_id, habit_id, log_id):
         return {"message": "Invalid field(s)", "data": errors}, 400
 
     log_data = log_schema.load(body)
-    Log.update_by_id(log_id, log_data)
-    updated_log = Log.find_by_id(log_id)
+    LogEngine.update_by_id(log_id, log_data)
+    updated_log = LogEngine.find_by_id(log_id)
 
     return log_schema.dump(updated_log), 200

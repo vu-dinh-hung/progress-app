@@ -1,7 +1,7 @@
 """Module for habit_router blueprint"""
 from flask import Blueprint, request
 from main.engines.habit import HabitEngine
-from main.models.log import Log
+from main.engines.log import LogEngine
 from main.schemas.habit_schema import (
     habit_schema,
     habits_schema,
@@ -34,7 +34,7 @@ def get_habits(user_id):
         user_id, query_params["page"], habits_per_page, False
     )
     for habit in habits:
-        habit.logs = Log.get_by_habit_in_month(
+        habit.logs = LogEngine.get_logs_by_habit_in_month(
             habit.id, query_params["logyear"], query_params["logmonth"]
         )
 
