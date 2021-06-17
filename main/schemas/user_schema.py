@@ -2,7 +2,8 @@
 from marshmallow import Schema, fields, validate, validates, ValidationError
 from marshmallow.decorators import post_load
 from main.schemas.base_schema import BaseSchema
-from main.models.user import User
+from main.engines.user import UserEngine
+from main.utils.password import hash_password
 
 
 def validate_password(password):
@@ -24,7 +25,7 @@ class UserSchema(BaseSchema):
     def make_password_hash(self, data, **kwargs):  # pylint: disable=no-self-use
         """Replace password with password_hash on deserialization"""
         if data.get("password"):
-            data["password_hash"] = User.hash_password(data["password"])
+            data["password_hash"] = hash_password(data["password"])
             data.pop("password", None)
         return data
 
@@ -59,14 +60,14 @@ class NewUserSchema(Schema):
         self, username, **kwargs
     ):  # pylint: disable=no-self-use
         """Validator for duplicate username"""
-        user = User.find_by_username(username)
+        user = UserEngine.find_by_username(username)
         if user:
             raise ValidationError("Username already exist")
 
     @post_load
     def make_password_hash(self, data, **kwargs):  # pylint: disable=no-self-use
         """Replace password with password_hash on deserialization"""
-        data["password_hash"] = User.hash_password(data["password"])
+        data["password_hash"] = hash_password(data["password"])
         data.pop("password")
         return data
 

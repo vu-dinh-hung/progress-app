@@ -44,10 +44,8 @@ def test_user_read(db_populated, users_in_db_getter):
     """Test that users are fetched correctly"""
     users = users_in_db_getter()
     user0 = User.find_by_id(users[0].id)
-    user1 = User.find_by_username(users[1].username)
 
     assert user0 == users[0]
-    assert user1 == users[1]
 
 
 def test_user_update(db_populated, users_in_db_getter):
