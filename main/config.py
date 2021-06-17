@@ -13,7 +13,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
-class DevConfig(Config):
+class DevelopmentConfig(Config):
     """Config class for development"""
 
     DEBUG = True
@@ -23,22 +23,21 @@ class DevConfig(Config):
     JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(days=1)
 
 
-class TestConfig(Config):
+class TestingConfig(Config):
     """Config class for testing"""
 
     TESTING = True
     SQLALCHEMY_DATABASE_URI = os.environ.get("TEST_DATABASE_URL", "sqlite://")
 
 
-class ProdConfig(Config):
+class ProductionConfig(Config):
     """Config class for production"""
 
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "db.sqlite")
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "sqlite:///db.sqlite")
 
 
 config = {
-    "development": DevConfig,
-    "testing": TestConfig,
-    "production": ProdConfig,
-    "default": DevConfig,
+    "development": DevelopmentConfig,
+    "testing": TestingConfig,
+    "production": ProductionConfig,
 }
