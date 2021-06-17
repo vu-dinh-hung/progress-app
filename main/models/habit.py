@@ -22,13 +22,13 @@ class Habit(db.Model):
     @classmethod
     def get_habit_count(cls, user_id):
         """Return count of all habits owned by user"""
-        return cls.query.filter_by(user_id=user_id).count()
+        return cls.query.filter_by(user_id=user_id, status="active").count()
 
     @classmethod
-    def get_in_month_paginated(cls, *args):
-        """Return a paginated list of habits, with nested logs filtered by the given month"""
+    def get_paginated(cls, user_id, *args):
+        """Return a paginated list of habits"""
         habits = (
-            cls.query.filter_by(status="active")
+            cls.query.filter_by(user_id=user_id, status="active")
             .order_by(cls.created_at.desc())
             .paginate(*args)
             .items
