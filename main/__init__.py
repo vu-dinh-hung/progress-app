@@ -1,16 +1,14 @@
 """Module for initializing the Flask application"""
 import logging
-import json
 from flask import Flask, request
 from flask_jwt_extended import JWTManager
-from werkzeug.exceptions import HTTPException
 from main.config import config
 from main.db import db
 from main.controllers.user_router import user_router
 from main.controllers.habit_router import habit_router
 from main.controllers.log_router import log_router
 from main.utils.logger import logger
-from main.utils.error_handlers import handle_exceptions
+from main.utils.error_handler import error_handler
 
 jwt = JWTManager()
 
@@ -22,7 +20,7 @@ def create_app(config_name):
     db.init_app(app)
     jwt.init_app(app)
 
-    # set up logging
+    # logging
     level = logging.INFO
     if config_name == "development":
         level = logging.DEBUG
@@ -41,17 +39,8 @@ def create_app(config_name):
         )
         return response
 
-    # set up error handling
-    @app.errorhandler(HTTPException)
-    def use_json_responses(exc):
-        """Return JSON instead of HTML for HTTP errors"""
-        response = exc.get_response()
-        response.data = json.dumps({"message": exc.description})
-        response.content_type = "application/json"
-
-        return response
-
-    app.register_error_handler(500, handle_exceptions)
+    # error handling
+    app.register_blueprint(error_handler)
 
     # routes
     prefix = "/api"
