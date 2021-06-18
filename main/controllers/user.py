@@ -2,7 +2,7 @@
 from flask import Blueprint, request
 from flask_jwt_extended import create_access_token
 from main.engines.user import UserEngine
-from main.schemas.user_schema import user_schema, new_user_schema, login_schema
+from main.schemas.user import user_schema, new_user_schema, login_schema
 from main.utils.decorators import jwt_required_verify_user
 from main.utils.password import check_password
 

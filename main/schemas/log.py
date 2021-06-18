@@ -1,6 +1,6 @@
 """Module for marshmallow schemas for log"""
 from marshmallow import Schema, fields, validate
-from main.schemas.base_schema import BaseSchema
+from main.schemas.base import BaseSchema
 from main.enums import LogStatus
 
 

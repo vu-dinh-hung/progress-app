@@ -4,9 +4,9 @@ from flask import Flask, request
 from flask_jwt_extended import JWTManager
 from main.config import config
 from main.db import db
-from main.controllers.user_router import user_router
-from main.controllers.habit_router import habit_router
-from main.controllers.log_router import log_router
+from main.controllers.user import user_router
+from main.controllers.habit import habit_router
+from main.controllers.log import log_router
 from main.utils.logger import logger
 from main.utils.error_handler import error_handler
 

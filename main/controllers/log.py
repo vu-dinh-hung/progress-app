@@ -2,7 +2,7 @@
 from flask import Blueprint, request
 from main.engines.habit import HabitEngine
 from main.engines.log import LogEngine
-from main.schemas.log_schema import (
+from main.schemas.log import (
     log_schema,
     new_log_schema,
     new_log_with_count_schema,

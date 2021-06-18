@@ -1,7 +1,7 @@
 """Module for marshmallow schemas for user"""
 from marshmallow import Schema, fields, validate, validates, ValidationError
 from marshmallow.decorators import post_load
-from main.schemas.base_schema import BaseSchema
+from main.schemas.base import BaseSchema
 from main.engines.user import UserEngine
 from main.utils.password import hash_password
 
@@ -64,7 +64,7 @@ class NewUserSchema(Schema):
         """Validator for duplicate username"""
         user = UserEngine.find_by_username(username)
         if user:
-            raise ValidationError("Username already exist")
+            raise ValidationError("Username already exists")
 
     @post_load
     def make_password_hash(

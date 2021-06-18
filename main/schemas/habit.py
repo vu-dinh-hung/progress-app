@@ -1,7 +1,7 @@
 """Module for marshmallow schemas for habit"""
 from marshmallow import Schema, fields, validate
-from main.schemas.base_schema import BaseSchema
-from main.schemas.log_schema import LogSchema
+from main.schemas.base import BaseSchema
+from main.schemas.log import LogSchema
 from main.enums import HabitStatus
 
 
