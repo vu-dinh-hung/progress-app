@@ -2,6 +2,7 @@
 from marshmallow import Schema, fields, validate
 from main.schemas.base_schema import BaseSchema
 from main.schemas.log_schema import LogSchema
+from main.enums import HabitStatus
 
 
 class HabitSchema(BaseSchema):
@@ -10,6 +11,10 @@ class HabitSchema(BaseSchema):
     name = fields.String()
     countable = fields.Boolean(dump_only=True)
     logs = fields.List(fields.Nested(LogSchema), dump_only=True)
+    status = fields.String(
+        load_only=True,
+        validate=[validate.OneOf([status.value for status in HabitStatus])],
+    )
 
 
 class NewHabitSchema(Schema):
@@ -31,7 +36,7 @@ class NewHabitSchema(Schema):
 
 
 class GetHabitQueryParamsSchema(Schema):
-    """Schema for validating and constructing data for GET habits (with nested logs)"""
+    """Schema for validating query params for GET habits (with nested logs)"""
 
     logyear = fields.Integer(
         required=True, error_messages={"required": "Logyear required"}

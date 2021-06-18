@@ -1,6 +1,7 @@
 """Module for LogEngine"""
 from sqlalchemy import extract
 from main.models.log import Log
+from main.enums import LogStatus
 
 
 class LogEngine:
@@ -26,7 +27,7 @@ class LogEngine:
     @staticmethod
     def query_logs_by_habit_id(habit_id):
         """Return a logs query object after filtering logs by habit_id and status='active'"""
-        return Log.query.filter_by(habit_id=habit_id, status="active")
+        return Log.query.filter_by(habit_id=habit_id, status=LogStatus.ACTIVE.value)
 
     @classmethod
     def get_logs_by_habit_in_month(cls, habit_id, year, month):

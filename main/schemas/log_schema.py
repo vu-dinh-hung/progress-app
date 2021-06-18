@@ -1,6 +1,7 @@
 """Module for marshmallow schemas for log"""
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, validate
 from main.schemas.base_schema import BaseSchema
+from main.enums import LogStatus
 
 
 class LogSchema(BaseSchema):
@@ -8,6 +9,10 @@ class LogSchema(BaseSchema):
 
     date = fields.Date(dump_only=True)
     count = fields.Integer(strict=True)
+    status = fields.String(
+        load_only=True,
+        validate=[validate.OneOf([status.value for status in LogStatus])],
+    )
 
 
 class NewLogSchema(Schema):

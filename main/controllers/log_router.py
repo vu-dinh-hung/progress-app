@@ -8,6 +8,7 @@ from main.schemas.log_schema import (
     new_log_with_count_schema,
 )
 from main.utils.decorators import jwt_required_verify_user_and_habit
+from main.enums import LogStatus
 
 log_router = Blueprint("log_router", __name__)
 BASE_URL = "/users/<user_id>/habits/<habit_id>"
@@ -33,8 +34,7 @@ def post_log(user_id, habit_id):  # pylint: disable=unused-argument
     log_in_db = LogEngine.get_log_by_habit_and_date(habit_id, log_data["date"])
     log = None
     if log_in_db:
-        print("found matching log")
-        log_in_db.status = "active"
+        log_in_db.status = LogStatus.ACTIVE.value
         log_in_db.save()
         log = log_in_db
     else:
