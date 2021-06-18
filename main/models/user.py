@@ -14,5 +14,5 @@ class User(db.Model):
     def __repr__(self) -> str:
         return (
             f"<User(id={self.id}, username={self.username}, name={self.name}, "
-            + f"status={self.status}, created_at={self.created_at}, updated_at={self.updated_at})>"
+            + f"created_at={self.created_at}, updated_at={self.updated_at})>"
         )
