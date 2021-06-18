@@ -13,7 +13,7 @@ class HabitSchema(BaseSchema):
     logs = fields.List(fields.Nested(LogSchema), dump_only=True)
     status = fields.String(
         load_only=True,
-        validate=[validate.OneOf([status.value for status in HabitStatus])],
+        validate=[validate.OneOf([HabitStatus.ACTIVE, HabitStatus.DELETED])],
     )
 
 

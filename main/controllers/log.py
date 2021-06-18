@@ -34,7 +34,7 @@ def post_log(user_id, habit_id):  # pylint: disable=unused-argument
     log_in_db = LogEngine.get_log_by_habit_and_date(habit_id, log_data["date"])
     log = None
     if log_in_db:
-        log_in_db.status = LogStatus.ACTIVE.value
+        log_in_db.status = LogStatus.ACTIVE
         log_in_db.save()
         log = log_in_db
     else:

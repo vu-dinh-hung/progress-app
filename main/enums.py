@@ -1,16 +1,15 @@
 """Module for app enums"""
-from enum import Enum
 
 
-class HabitStatus(Enum):
-    """Enum class for Habit-specific statuses"""
+class HabitStatus:
+    """Class for enumerating Habit-specific statuses"""
 
     ACTIVE = "active"
     DELETED = "deleted"
 
 
-class LogStatus(Enum):
-    """Enum class for Log-specific statuses"""
+class LogStatus:
+    """Class for enumerating Log-specific statuses"""
 
     ACTIVE = "active"
     DELETED = "deleted"

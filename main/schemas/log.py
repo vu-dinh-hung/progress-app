@@ -11,7 +11,7 @@ class LogSchema(BaseSchema):
     count = fields.Integer(strict=True)
     status = fields.String(
         load_only=True,
-        validate=[validate.OneOf([status.value for status in LogStatus])],
+        validate=[validate.OneOf([LogStatus.ACTIVE, LogStatus.DELETED])],
     )
 
 

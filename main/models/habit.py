@@ -11,7 +11,7 @@ class Habit(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     countable = db.Column(db.Boolean, default=False, nullable=False)
-    status = db.Column(db.String(32), default=HabitStatus.ACTIVE.value, nullable=False)
+    status = db.Column(db.String(32), default=HabitStatus.ACTIVE, nullable=False)
 
     def __repr__(self) -> str:
         return (

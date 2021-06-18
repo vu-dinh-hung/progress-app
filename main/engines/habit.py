@@ -26,7 +26,7 @@ class HabitEngine:
     @staticmethod
     def query_habits_by_user_id(user_id):
         """Return a habits query object after filtering habits by user_id and status='active'"""
-        return Habit.query.filter_by(user_id=user_id, status=HabitStatus.ACTIVE.value)
+        return Habit.query.filter_by(user_id=user_id, status=HabitStatus.ACTIVE)
 
     @classmethod
     def get_habit_count(cls, user_id):

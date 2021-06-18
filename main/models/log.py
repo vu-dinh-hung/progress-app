@@ -11,7 +11,7 @@ class Log(db.Model):
     habit_id = db.Column(db.Integer, db.ForeignKey("habits.id"), nullable=False)
     date = db.Column(db.Date, nullable=False)
     count = db.Column(db.Integer, nullable=True)  # defaults to NULL
-    status = db.Column(db.String(32), default=LogStatus.ACTIVE.value, nullable=False)
+    status = db.Column(db.String(32), default=LogStatus.ACTIVE, nullable=False)
 
     def __repr__(self) -> str:
         return (
