@@ -14,7 +14,7 @@ from main.utils.decorators import (
 )
 
 habit_router = Blueprint("habit_router", __name__)
-BASE_URL = "/users/<user_id>/habits"
+BASE_URL = "/users/<int:user_id>/habits"
 
 
 @habit_router.route(BASE_URL, methods=["GET"])
@@ -27,8 +27,6 @@ def get_habits(user_id):
 
     query_params = get_habit_query_params_schema.load(request.args)
     habits_per_page = 20
-    if not query_params["page"]:
-        return {"message": "Page query parameter required"}
 
     habits = HabitEngine.get_habits_paginated(
         user_id, query_params["page"], habits_per_page, False
@@ -56,12 +54,11 @@ def post_habit(user_id):
 
     habit_data = new_habit_schema.load(body)
     habit = HabitEngine.create_habit(**habit_data, user_id=int(user_id))
-    habit.save()
 
     return habit_schema.dump(habit), 201
 
 
-@habit_router.route(f"{BASE_URL}/<habit_id>", methods=["PUT"])
+@habit_router.route(f"{BASE_URL}/<int:habit_id>", methods=["PUT"])
 @jwt_required_verify_user_and_habit()
 def put_habit(user_id, habit_id):  # pylint: disable=unused-argument
     """PUT habit"""

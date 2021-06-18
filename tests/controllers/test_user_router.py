@@ -33,10 +33,10 @@ def test_login(client, db_populated):
     ],
 )
 def test_login_errors(client, users_in_db_getter, user_data, invalid_field):
-    """Test that logging in with invalid user data fails correctly with 401"""
+    """Test that logging in with invalid payload fails correctly with 400"""
     res = client.post("/api/login", data=json.dumps(user_data))
 
-    assert res.status_code == 401
+    assert res.status_code == 400
     assert res.json["data"][invalid_field]
 
 

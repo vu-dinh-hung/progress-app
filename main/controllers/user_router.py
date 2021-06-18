@@ -15,7 +15,7 @@ def login():
     body = request.get_json(force=True)
     errors = login_schema.validate(body)
     if errors:
-        return {"message": "Missing field(s)", "data": errors}, 401
+        return {"message": "Missing field(s)", "data": errors}, 400
 
     credentials = login_schema.load(body)
     user = UserEngine.find_by_username(credentials["username"])
@@ -41,7 +41,7 @@ def post_user():
     return user_schema.dump(user), 201
 
 
-@user_router.route("/users/<user_id>", methods=["GET"])
+@user_router.route("/users/<int:user_id>", methods=["GET"])
 @jwt_required_verify_user()
 def get_user(user_id):
     """GET user"""
@@ -52,7 +52,7 @@ def get_user(user_id):
     return user_schema.dump(user), 200
 
 
-@user_router.route("/users/<user_id>", methods=["PUT"])
+@user_router.route("/users/<int:user_id>", methods=["PUT"])
 @jwt_required_verify_user()
 def put_user(user_id):
     """PUT user"""

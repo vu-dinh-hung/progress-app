@@ -11,7 +11,7 @@ from main.utils.decorators import jwt_required_verify_user_and_habit
 from main.enums import LogStatus
 
 log_router = Blueprint("log_router", __name__)
-BASE_URL = "/users/<user_id>/habits/<habit_id>"
+BASE_URL = "/users/<int:user_id>/habits/<int:habit_id>"
 
 
 @log_router.route(f"{BASE_URL}/logs", methods=["POST"])
@@ -30,7 +30,7 @@ def post_log(user_id, habit_id):  # pylint: disable=unused-argument
 
     log_data = schema.load(body)
 
-    # if log for given date and habit already exist, set status of that log to 'active'
+    # if log for given date and habit already exists, set status of that log to 'active'
     log_in_db = LogEngine.get_log_by_habit_and_date(habit_id, log_data["date"])
     log = None
     if log_in_db:
@@ -39,17 +39,16 @@ def post_log(user_id, habit_id):  # pylint: disable=unused-argument
         log = log_in_db
     else:
         log = LogEngine.create_log(**log_data, habit_id=int(habit_id))
-        log.save()
 
     return log_schema.dump(log), 201
 
 
-@log_router.route(f"{BASE_URL}/logs/<log_id>", methods=["PUT"])
+@log_router.route(f"{BASE_URL}/logs/<int:log_id>", methods=["PUT"])
 @jwt_required_verify_user_and_habit()
 def put_log(user_id, habit_id, log_id):  # pylint: disable=unused-argument
     """PUT log"""
     log = LogEngine.find_by_id(log_id)
-    if not log or habit_id != str(log.habit_id):
+    if not log or habit_id != log.habit_id:
         return {"message": "Log not found"}, 404
 
     body = request.get_json(force=True)
