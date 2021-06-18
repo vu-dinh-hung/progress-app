@@ -29,7 +29,6 @@ class Base(Model):
         onupdate=datetime.utcnow,
         nullable=False,
     )
-    status = sa.Column(sa.String(32), default="active", nullable=False)
 
     @classmethod
     def find_by_id(cls, _id):
