@@ -2,13 +2,14 @@
 import logging
 from flask import Flask, request
 from flask_jwt_extended import JWTManager
+from werkzeug.exceptions import HTTPException
 from main.config import config
 from main.db import db
 from main.controllers.user import user_router
 from main.controllers.habit import habit_router
 from main.controllers.log import log_router
 from main.utils.logger import logger
-from main.utils.error_handler import error_handler
+from main.utils.error_handler import use_json_errors, handle_exceptions
 
 jwt = JWTManager()
 
@@ -40,9 +41,14 @@ def create_app(config_name):
         return response
 
     # error handling
-    app.register_blueprint(error_handler)
+    app.register_error_handler(Exception, handle_exceptions)
+    app.register_error_handler(HTTPException, use_json_errors)
 
     # routes
+    @app.route("/")
+    def err():
+        return 1 / 0
+
     prefix = "/api"
     app.register_blueprint(user_router, url_prefix=prefix)
     app.register_blueprint(habit_router, url_prefix=prefix)
