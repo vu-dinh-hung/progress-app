@@ -7,7 +7,7 @@ from main.schemas.log import (
     new_log_schema,
     new_log_with_count_schema,
 )
-from main.utils.decorators import jwt_required_verify_user_and_habit
+from main.utils.decorators import verify_user, verify_habit
 from main.enums import LogStatus
 from main.exceptions import BadRequestError, NotFoundError
 
@@ -16,7 +16,8 @@ BASE_URL = "/users/<int:user_id>/habits/<int:habit_id>"
 
 
 @log_router.route(f"{BASE_URL}/logs", methods=["POST"])
-@jwt_required_verify_user_and_habit()
+@verify_user
+@verify_habit
 def post_log(user_id, habit_id):  # pylint: disable=unused-argument
     """POST log"""
     habit = HabitEngine.find_by_id(habit_id)
@@ -45,7 +46,8 @@ def post_log(user_id, habit_id):  # pylint: disable=unused-argument
 
 
 @log_router.route(f"{BASE_URL}/logs/<int:log_id>", methods=["PUT"])
-@jwt_required_verify_user_and_habit()
+@verify_user
+@verify_habit
 def put_log(user_id, habit_id, log_id):  # pylint: disable=unused-argument
     """PUT log"""
     log = LogEngine.find_by_id(log_id)

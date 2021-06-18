@@ -3,7 +3,7 @@ from flask import Blueprint, request
 from flask_jwt_extended import create_access_token
 from main.engines.user import UserEngine
 from main.schemas.user import user_schema, new_user_schema, login_schema
-from main.utils.decorators import jwt_required_verify_user
+from main.utils.decorators import verify_user
 from main.utils.password import check_password
 from main.exceptions import BadRequestError, UnauthorizedError, NotFoundError
 
@@ -43,7 +43,7 @@ def post_user():
 
 
 @user_router.route("/users/<int:user_id>", methods=["GET"])
-@jwt_required_verify_user()
+@verify_user
 def get_user(user_id):
     """GET user"""
     user = UserEngine.find_by_id(user_id)
@@ -54,7 +54,7 @@ def get_user(user_id):
 
 
 @user_router.route("/users/<int:user_id>", methods=["PUT"])
-@jwt_required_verify_user()
+@verify_user
 def put_user(user_id):
     """PUT user"""
     body = request.get_json(force=True)

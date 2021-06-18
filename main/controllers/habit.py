@@ -9,8 +9,8 @@ from main.schemas.habit import (
     get_habit_query_params_schema,
 )
 from main.utils.decorators import (
-    jwt_required_verify_user,
-    jwt_required_verify_user_and_habit,
+    verify_user,
+    verify_habit,
 )
 from main.exceptions import BadRequestError
 
@@ -19,7 +19,7 @@ BASE_URL = "/users/<int:user_id>/habits"
 
 
 @habit_router.route(BASE_URL, methods=["GET"])
-@jwt_required_verify_user()
+@verify_user
 def get_habits(user_id):
     """GET habits"""
     errors = get_habit_query_params_schema.validate(request.args)
@@ -45,7 +45,7 @@ def get_habits(user_id):
 
 
 @habit_router.route(BASE_URL, methods=["POST"])
-@jwt_required_verify_user()
+@verify_user
 def post_habit(user_id):
     """POST habit"""
     body = request.get_json(force=True)
@@ -60,7 +60,8 @@ def post_habit(user_id):
 
 
 @habit_router.route(f"{BASE_URL}/<int:habit_id>", methods=["PUT"])
-@jwt_required_verify_user_and_habit()
+@verify_user
+@verify_habit
 def put_habit(user_id, habit_id):  # pylint: disable=unused-argument
     """PUT habit"""
     body = request.get_json(force=True)
