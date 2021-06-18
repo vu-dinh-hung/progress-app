@@ -2,6 +2,7 @@
 from functools import wraps
 from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
 from main.models.habit import Habit
+from main.exceptions import NotFoundError
 
 
 def jwt_required_verify_user():
@@ -13,10 +14,10 @@ def jwt_required_verify_user():
             verify_jwt_in_request()
             jwt_id = get_jwt_identity()
 
-            if user_id == jwt_id:
-                return func(user_id, *args, **kwargs)
+            if user_id != jwt_id:
+                raise NotFoundError("User not found")
 
-            return {"message": "User not found"}, 404
+            return func(user_id, *args, **kwargs)
 
         return decorator
 
@@ -33,11 +34,11 @@ def jwt_required_verify_user_and_habit():
             jwt_id = get_jwt_identity()
 
             if user_id != jwt_id:
-                return {"message": "User not found"}, 404
+                raise NotFoundError("User not found")
 
             habit = Habit.find_by_id(habit_id)
             if not habit or user_id != habit.user_id:
-                return {"message": "Habit not found"}, 404
+                raise NotFoundError("Habit not found")
 
             return func(user_id, habit_id, *args, **kwargs)
 

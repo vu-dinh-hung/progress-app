@@ -9,6 +9,7 @@ from main.schemas.log import (
 )
 from main.utils.decorators import jwt_required_verify_user_and_habit
 from main.enums import LogStatus
+from main.exceptions import BadRequestError, NotFoundError
 
 log_router = Blueprint("log_router", __name__)
 BASE_URL = "/users/<int:user_id>/habits/<int:habit_id>"
@@ -26,7 +27,7 @@ def post_log(user_id, habit_id):  # pylint: disable=unused-argument
     body = request.get_json(force=True)
     errors = schema.validate(body)
     if errors:
-        return {"message": "Invalid field(s)", "data": errors}, 400
+        raise BadRequestError("Invalid field(s)", errors)
 
     log_data = schema.load(body)
 
@@ -49,12 +50,12 @@ def put_log(user_id, habit_id, log_id):  # pylint: disable=unused-argument
     """PUT log"""
     log = LogEngine.find_by_id(log_id)
     if not log or habit_id != log.habit_id:
-        return {"message": "Log not found"}, 404
+        raise NotFoundError("Log not found")
 
     body = request.get_json(force=True)
     errors = log_schema.validate(body)
     if errors:
-        return {"message": "Invalid field(s)", "data": errors}, 400
+        raise BadRequestError("Invalid field(s)", errors)
 
     log_data = log_schema.load(body)
     LogEngine.update_by_id(log_id, log_data)

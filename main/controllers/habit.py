@@ -12,6 +12,7 @@ from main.utils.decorators import (
     jwt_required_verify_user,
     jwt_required_verify_user_and_habit,
 )
+from main.exceptions import BadRequestError
 
 habit_router = Blueprint("habit_router", __name__)
 BASE_URL = "/users/<int:user_id>/habits"
@@ -23,7 +24,7 @@ def get_habits(user_id):
     """GET habits"""
     errors = get_habit_query_params_schema.validate(request.args)
     if errors:
-        return {"message": "Invalid query parameters", "data": errors}, 400
+        raise BadRequestError("Invalid query parameters", errors)
 
     query_params = get_habit_query_params_schema.load(request.args)
     habits_per_page = 20
@@ -50,7 +51,7 @@ def post_habit(user_id):
     body = request.get_json(force=True)
     errors = new_habit_schema.validate(body)
     if errors:
-        return {"message": "Invalid field(s)", "data": errors}, 400
+        raise BadRequestError("Invalid field(s)", errors)
 
     habit_data = new_habit_schema.load(body)
     habit = HabitEngine.create_habit(**habit_data, user_id=int(user_id))
@@ -65,7 +66,7 @@ def put_habit(user_id, habit_id):  # pylint: disable=unused-argument
     body = request.get_json(force=True)
     errors = habit_schema.validate(body)
     if errors:
-        return {"message": "Invalid field(s)", "data": errors}, 400
+        raise BadRequestError("Invalid field(s)", errors)
 
     habit_data = habit_schema.load(body)
     HabitEngine.update_by_id(habit_id, habit_data)

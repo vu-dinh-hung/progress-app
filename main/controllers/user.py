@@ -5,6 +5,7 @@ from main.engines.user import UserEngine
 from main.schemas.user import user_schema, new_user_schema, login_schema
 from main.utils.decorators import jwt_required_verify_user
 from main.utils.password import check_password
+from main.exceptions import BadRequestError, UnauthorizedError, NotFoundError
 
 user_router = Blueprint("user_router", __name__)
 
@@ -15,12 +16,12 @@ def login():
     body = request.get_json(force=True)
     errors = login_schema.validate(body)
     if errors:
-        return {"message": "Missing field(s)", "data": errors}, 400
+        raise BadRequestError("Missing field(s)", errors)
 
     credentials = login_schema.load(body)
     user = UserEngine.find_by_username(credentials["username"])
     if not user or not check_password(credentials["password"], user.password_hash):
-        return {"message": "Wrong username or password"}, 401
+        raise UnauthorizedError("Wrong username or password")
 
     access_token = create_access_token(identity=user.id, fresh=True)
 
@@ -33,7 +34,7 @@ def post_user():
     body = request.get_json(force=True)
     errors = new_user_schema.validate(body)
     if errors:
-        return {"message": "Invalid field(s)", "data": errors}, 400
+        raise BadRequestError("Invalid field(s)", errors)
 
     user_data = new_user_schema.load(body)
     user = UserEngine.create_user(**user_data)
@@ -47,7 +48,7 @@ def get_user(user_id):
     """GET user"""
     user = UserEngine.find_by_id(user_id)
     if not user:
-        return {"message": "User not found"}, 404
+        raise NotFoundError("User not found")
 
     return user_schema.dump(user), 200
 
@@ -59,7 +60,7 @@ def put_user(user_id):
     body = request.get_json(force=True)
     errors = user_schema.validate(body)
     if errors:
-        return {"data": errors}, 400
+        raise BadRequestError("Invalid field(s)", errors)
 
     update_data = user_schema.load(body)
     UserEngine.update_by_id(user_id, update_data)
