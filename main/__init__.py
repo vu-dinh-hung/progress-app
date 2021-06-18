@@ -1,7 +1,9 @@
 """Module for initializing the Flask application"""
 import logging
+import json
 from flask import Flask, request
 from flask_jwt_extended import JWTManager
+from werkzeug.exceptions import HTTPException
 from main.config import config
 from main.db import db
 from main.controllers.user_router import user_router
@@ -37,6 +39,16 @@ def create_app(config_name):
             request.full_path,
             response.status,
         )
+        return response
+
+    # set up error handling
+    @app.errorhandler(HTTPException)
+    def use_json_responses(exc):
+        """Return JSON instead of HTML for HTTP errors"""
+        response = exc.get_response()
+        response.data = json.dumps({"message": exc.description})
+        response.content_type = "application/json"
+
         return response
 
     app.register_error_handler(500, handle_exceptions)
