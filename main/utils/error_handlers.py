@@ -18,7 +18,7 @@ def handle_exceptions(exc):  # pylint: disable=unused-argument
     return {"message": "Something went wrong on the server end"}, 500
 
 
-def use_json_errors(exc):
+def handle_http_errors(exc):
     """Return JSON instead of HTML for HTTP errors"""
     response = exc.get_response()
     response.data = json.dumps({"message": exc.description})

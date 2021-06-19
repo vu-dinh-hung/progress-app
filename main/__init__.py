@@ -11,7 +11,7 @@ from main.controllers.log import log_router
 from main.utils.logger import logger
 from main.exceptions import BadRequestError, UnauthorizedError, NotFoundError
 from main.utils.error_handlers import (
-    use_json_errors,
+    handle_http_errors,
     handle_exceptions,
     handle_bad_request,
     handle_not_found,
@@ -49,7 +49,7 @@ def create_app(config_name):
 
     # error handling
     app.register_error_handler(Exception, handle_exceptions)
-    app.register_error_handler(HTTPException, use_json_errors)
+    app.register_error_handler(HTTPException, handle_http_errors)
     app.register_error_handler(BadRequestError, handle_bad_request)
     app.register_error_handler(UnauthorizedError, handle_unauthorized)
     app.register_error_handler(NotFoundError, handle_not_found)
