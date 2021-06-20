@@ -1,11 +1,12 @@
 """Module for user_router blueprint"""
+# pylint: disable=unused-argument
 from flask import Blueprint
 from flask_jwt_extended import create_access_token
 from main.engines.user import get_user, update_user, create_user, get_user_by_username
 from main.schemas.user import user_schema, new_user_schema, login_schema
 from main.utils.decorators import load_data, verify_user
 from main.utils.password import check_password
-from main.exceptions import UnauthorizedError, NotFoundError
+from main.exceptions import UnauthorizedError
 
 user_router = Blueprint("user_router", __name__)
 
@@ -34,21 +35,17 @@ def post(data):
 
 @user_router.route("/users/<int:user_id>", methods=["GET"])
 @verify_user
-def get(user_id):
+def get(user_id, user):
     """GET user"""
-    user = get_user(user_id)
-    if not user:
-        raise NotFoundError("User not found")
-
     return user_schema.dump(user), 200
 
 
 @user_router.route("/users/<int:user_id>", methods=["PUT"])
 @load_data(user_schema)
 @verify_user
-def put(data, user_id):
+def put(user_id, user, data):
     """PUT user"""
-    update_user(user_id, data)
-    user = get_user(user_id)
+    update_user(user.id, data)
+    user = get_user(user.id)
 
     return user_schema.dump(user), 200

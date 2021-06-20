@@ -1,6 +1,6 @@
 """Module for log_router blueprint"""
+# pylint: disable=unused-argument
 from flask import Blueprint, request
-from main.engines.habit import get_habit
 from main.engines.log import get_log, update_log, create_log, get_log_by_habit_and_date
 from main.schemas.log import (
     log_schema,
@@ -18,10 +18,8 @@ BASE_URL = "/users/<int:user_id>/habits/<int:habit_id>"
 @log_router.route(f"{BASE_URL}/logs", methods=["POST"])
 @verify_user
 @verify_habit
-def post(user_id, habit_id):  # pylint: disable=unused-argument
+def post(user_id, habit_id, user, habit):
     """POST log"""
-    habit = get_habit(habit_id)
-
     # load log schema according to countability of habit
     schema = new_log_with_count_schema if habit.countable else new_log_schema
 
@@ -33,14 +31,14 @@ def post(user_id, habit_id):  # pylint: disable=unused-argument
     log_data = schema.load(body)
 
     # if log for given date and habit already exists, set status of that log to 'active'
-    log_in_db = get_log_by_habit_and_date(habit_id, log_data["date"])
+    log_in_db = get_log_by_habit_and_date(habit.id, log_data["date"])
     log = None
     if log_in_db:
         log_in_db.status = LogStatus.ACTIVE
         log_in_db.save()
         log = log_in_db
     else:
-        log = create_log(**log_data, habit_id=int(habit_id))
+        log = create_log(**log_data, habit_id=habit.id)
 
     return log_schema.dump(log), 201
 
@@ -50,9 +48,11 @@ def post(user_id, habit_id):  # pylint: disable=unused-argument
 @verify_habit
 @verify_log
 @load_data(log_schema)
-def put(data, user_id, habit_id, log_id):  # pylint: disable=unused-argument
+def put(
+    user_id, habit_id, log_id, user, habit, log, data
+):  # pylint: disable=unused-argument
     """PUT log"""
-    update_log(log_id, data)
-    updated_log = get_log(log_id)
+    update_log(log.id, data)
+    updated_log = get_log(log.id)
 
     return log_schema.dump(updated_log), 200

@@ -41,9 +41,9 @@ def load_data(schema):
 
 
 def verify_user(func):
-    """Check whether jwt contains id that matches user_id in url
+    """Check whether jwt contains id that matches user_id in url, and loads the user if successful
 
-    View function should include a 'user_id' parameter.
+    View function should include a 'user' parameter.
     """
 
     @wraps(func)
@@ -58,15 +58,15 @@ def verify_user(func):
         if not user:
             raise NotFoundError(error_message)
 
-        return func(*args, **kwargs, user_id=user_id)
+        return func(user_id, *args, **kwargs, user=user)
 
     return wrapper
 
 
 def verify_habit(func):
-    """Check that user with user_id owns habit_id
+    """Check that user with user_id owns habit_id, and loads the habit if successful
 
-    View function should include a 'habit_id' parameter.
+    View function should include a 'habit' parameter.
     """
 
     @wraps(func)
@@ -75,15 +75,15 @@ def verify_habit(func):
         if not habit or user_id != habit.user_id:
             raise NotFoundError("Habit not found")
 
-        return func(*args, **kwargs, user_id=user_id, habit_id=habit_id)
+        return func(user_id, habit_id, *args, **kwargs, habit=habit)
 
     return wrapper
 
 
 def verify_log(func):
-    """Check that habit with habit_id owns log_id
+    """Check that habit with habit_id owns log_id, and loads the log if successful
 
-    View function should include a 'log_id' parameter.
+    View function should include a 'log' parameter.
     """
 
     @wraps(func)
@@ -92,6 +92,6 @@ def verify_log(func):
         if not log or habit_id != log.habit_id:
             raise NotFoundError("Log not found")
 
-        return func(*args, **kwargs, user_id=user_id, habit_id=habit_id, log_id=log_id)
+        return func(user_id, habit_id, log_id, *args, **kwargs, log=log)
 
     return wrapper
