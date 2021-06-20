@@ -19,6 +19,7 @@ def test_login(client, db_populated):
 
     assert res.status_code == 200
     assert res.json["access_token"]
+    assert res.json["user"]
 
 
 @pytest.mark.parametrize(
@@ -188,7 +189,7 @@ def test_put_user(
 def test_put_user_errors(
     client, db_populated, users_in_db_getter, jwt_user_0, user_data, invalid_field
 ):
-    """Test that users can be PUT correctly with valid data"""
+    """Test that invalid user data are not PUT"""
     users_before = users_in_db_getter()
 
     res = client.put(
