@@ -1,11 +1,11 @@
 """Module for marshmallow schemas for log"""
-from marshmallow import Schema, fields, validate
+from marshmallow import fields, validate
 from main.schemas.base import BaseSchema
 from main.enums import LogStatus
 
 
 class LogSchema(BaseSchema):
-    """Schema for validating log response data and log PUT request data"""
+    """Schema for validating log response data"""
 
     date = fields.Date(dump_only=True)
     count = fields.Integer(strict=True)
@@ -15,26 +15,30 @@ class LogSchema(BaseSchema):
     )
 
 
-class NewLogSchema(Schema):
-    """Schema for validating POST request data for uncountable log"""
+class PostLogSchema(LogSchema):
+    """Schema for validating log POST request data"""
+
+    class Meta:
+        """Options class"""
+
+        exclude = ("status",)
+
+    count = fields.Integer(
+        strict=True,
+        load_only=True,
+        error_messages={"required": "Count required"},
+    )
 
     date = fields.Date(
         required=True, load_only=True, error_messages={"required": "Date required"}
     )
 
 
-class NewLogWithCountSchema(NewLogSchema):
-    """Schema for validating POST request data for countable log"""
-
-    count = fields.Integer(
-        required=True,
-        strict=True,
-        load_only=True,
-        error_messages={"required": "Count required"},
-    )
+class PutLogSchema(LogSchema):
+    """Schema for validating log PUT request data"""
 
 
 log_schema = LogSchema()
 logs_schema = LogSchema(many=True)
-new_log_schema = NewLogSchema()
-new_log_with_count_schema = NewLogWithCountSchema()
+post_log_schema = PostLogSchema()
+put_log_schema = PutLogSchema()

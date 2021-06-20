@@ -14,7 +14,7 @@ def validate_password(password):
 
 
 class UserSchema(BaseSchema):
-    """Schema for validating user response data and user PUT request data"""
+    """Schema for validating user response data"""
 
     username = fields.String(dump_only=True)
     name = fields.String()
@@ -31,7 +31,7 @@ class UserSchema(BaseSchema):
         return data
 
 
-class NewUserSchema(Schema):
+class PostUserSchema(UserSchema):
     """Schema for validating user POST request data"""
 
     min_username, max_username = 4, 30
@@ -54,16 +54,10 @@ class NewUserSchema(Schema):
         validate=[validate_password],
         error_messages={"required": "Password required"},
     )
-    name = fields.String()
 
-    @post_load
-    def make_password_hash(
-        self, data, **kwargs
-    ):  # pylint: disable=no-self-use,unused-argument
-        """Replace password with password_hash on deserialization"""
-        data["password_hash"] = hash_password(data["password"])
-        data.pop("password")
-        return data
+
+class PutUserSchema(UserSchema):
+    """Schema for validating user PUT request data"""
 
 
 class LoginSchema(Schema):
@@ -79,4 +73,5 @@ class LoginSchema(Schema):
 
 user_schema = UserSchema()
 login_schema = LoginSchema()
-new_user_schema = NewUserSchema()
+post_user_schema = PostUserSchema()
+put_user_schema = PutUserSchema()

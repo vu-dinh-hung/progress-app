@@ -6,7 +6,7 @@ from main.enums import HabitStatus
 
 
 class HabitSchema(BaseSchema):
-    """Schema for validating habit response data and habit PUT request data"""
+    """Schema for validating habit response data"""
 
     name = fields.String()
     countable = fields.Boolean(dump_only=True)
@@ -17,8 +17,13 @@ class HabitSchema(BaseSchema):
     )
 
 
-class NewHabitSchema(Schema):
+class PostHabitSchema(HabitSchema):
     """Schema for validating habit POST request data"""
+
+    class Meta:
+        """Options class"""
+
+        exclude = ("status",)
 
     min_name, max_name = 1, 80
     name = fields.String(
@@ -35,6 +40,10 @@ class NewHabitSchema(Schema):
     countable = fields.Boolean()
 
 
+class PutHabitSchema(HabitSchema):
+    """Schema for validating habit PUT request data"""
+
+
 class HabitQueryParamsSchema(Schema):
     """Schema for validating query params for GET habits (with nested logs)"""
 
@@ -49,5 +58,6 @@ class HabitQueryParamsSchema(Schema):
 
 habit_schema = HabitSchema()
 habits_schema = HabitSchema(many=True)
-new_habit_schema = NewHabitSchema()
+post_habit_schema = PostHabitSchema()
+put_habit_schema = PutHabitSchema()
 habit_query_params_schema = HabitQueryParamsSchema()

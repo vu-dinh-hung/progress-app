@@ -11,7 +11,8 @@ from main.engines.habit import (
 from main.schemas.habit import (
     habit_schema,
     habits_schema,
-    new_habit_schema,
+    post_habit_schema,
+    put_habit_schema,
     habit_query_params_schema,
 )
 from main.engines.log import get_logs_by_habit_in_month
@@ -47,7 +48,7 @@ def get(user_id, user, data):
 
 @habit_router.route(BASE_URL, methods=["POST"])
 @verify_user
-@load_data(new_habit_schema)
+@load_data(post_habit_schema)
 def post(user_id, user, data):
     """POST habit"""
     habit = create_habit(**data, user_id=user.id)
@@ -58,7 +59,7 @@ def post(user_id, user, data):
 @habit_router.route(f"{BASE_URL}/<int:habit_id>", methods=["PUT"])
 @verify_user
 @verify_habit
-@load_data(habit_schema)
+@load_data(put_habit_schema)
 def put(user_id, habit_id, user, habit, data):
     """PUT habit"""
     update_habit(habit.id, data)

@@ -2,6 +2,8 @@
 from sqlalchemy import extract
 from main.models.log import Log
 from main.enums import LogStatus
+from main.exceptions import BadRequestError
+from main.engines.habit import get_habit
 
 
 def get_log(log_id):
@@ -16,7 +18,15 @@ def update_log(log_id, data):
 
 def create_log(*, habit_id, date, count=None):
     """Create and save a log into database, then return the log"""
-    # if log for given date and habit already exists, set status of that log to 'active'
+    # Verify 'count' field
+    habit = get_habit(habit_id)
+    if habit.countable and count is None:
+        raise BadRequestError("Log for countable habit should include a count")
+
+    if not habit.countable and count is not None:
+        raise BadRequestError("Log for uncountable habit should not include a count")
+
+    # If log for given date and habit already exists, set status of that log to 'active'
     log = get_log_by_habit_and_date(habit_id, date)
     if log:
         log.status = LogStatus.ACTIVE

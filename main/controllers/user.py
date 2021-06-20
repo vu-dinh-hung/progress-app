@@ -3,7 +3,12 @@
 from flask import Blueprint
 from flask_jwt_extended import create_access_token
 from main.engines.user import get_user, update_user, create_user, get_user_by_username
-from main.schemas.user import user_schema, new_user_schema, login_schema
+from main.schemas.user import (
+    user_schema,
+    post_user_schema,
+    put_user_schema,
+    login_schema,
+)
 from main.utils.decorators import load_data, verify_user
 from main.utils.password import check_password
 from main.exceptions import UnauthorizedError
@@ -25,7 +30,7 @@ def login(data):
 
 
 @user_router.route("/users", methods=["POST"])
-@load_data(new_user_schema)
+@load_data(post_user_schema)
 def post(data):
     """POST user"""
     user = create_user(**data)
@@ -41,7 +46,7 @@ def get(user_id, user):
 
 
 @user_router.route("/users/<int:user_id>", methods=["PUT"])
-@load_data(user_schema)
+@load_data(put_user_schema)
 @verify_user
 def put(user_id, user, data):
     """PUT user"""
