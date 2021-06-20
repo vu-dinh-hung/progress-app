@@ -7,17 +7,17 @@ from main.schemas.log import (
     new_log_schema,
     new_log_with_count_schema,
 )
-from main.utils.decorators import load_data, verify_user, verify_habit
+from main.utils.decorators import load_data, verify_user, verify_habit, verify_log
 from main.enums import LogStatus
-from main.exceptions import BadRequestError, NotFoundError
+from main.exceptions import BadRequestError
 
 log_router = Blueprint("log_router", __name__)
 BASE_URL = "/users/<int:user_id>/habits/<int:habit_id>"
 
 
 @log_router.route(f"{BASE_URL}/logs", methods=["POST"])
-@verify_habit
 @verify_user
+@verify_habit
 def post(user_id, habit_id):  # pylint: disable=unused-argument
     """POST log"""
     habit = get_habit(habit_id)
@@ -46,15 +46,12 @@ def post(user_id, habit_id):  # pylint: disable=unused-argument
 
 
 @log_router.route(f"{BASE_URL}/logs/<int:log_id>", methods=["PUT"])
-@verify_habit
 @verify_user
+@verify_habit
+@verify_log
 @load_data(log_schema)
 def put(data, user_id, habit_id, log_id):  # pylint: disable=unused-argument
     """PUT log"""
-    log = get_log(log_id)
-    if not log or habit_id != log.habit_id:
-        raise NotFoundError("Log not found")
-
     update_log(log_id, data)
     updated_log = get_log(log_id)
 

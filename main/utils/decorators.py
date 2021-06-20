@@ -4,6 +4,7 @@ from flask import request
 from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
 from main.engines.user import get_user
 from main.engines.habit import get_habit
+from main.engines.log import get_log
 from main.exceptions import BadRequestError, NotFoundError
 
 
@@ -75,5 +76,22 @@ def verify_habit(func):
             raise NotFoundError("Habit not found")
 
         return func(*args, **kwargs, user_id=user_id, habit_id=habit_id)
+
+    return wrapper
+
+
+def verify_log(func):
+    """Check that habit with habit_id owns log_id
+
+    View function should include a 'log_id' parameter.
+    """
+
+    @wraps(func)
+    def wrapper(user_id, habit_id, log_id, *args, **kwargs):
+        log = get_log(log_id)
+        if not log or habit_id != log.habit_id:
+            raise NotFoundError("Log not found")
+
+        return func(*args, **kwargs, user_id=user_id, habit_id=habit_id, log_id=log_id)
 
     return wrapper
