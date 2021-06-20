@@ -55,10 +55,6 @@ def create_app(config_name: str):
     app.register_error_handler(NotFoundError, handle_not_found)
 
     # routes
-    @app.route("/")
-    def err():
-        return 1 / 0
-
     prefix = "/api"
     app.register_blueprint(user_router, url_prefix=prefix)
     app.register_blueprint(habit_router, url_prefix=prefix)
