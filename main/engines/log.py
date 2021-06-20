@@ -14,9 +14,9 @@ def update_log(log_id, data):
     Log.update_by_id(log_id, data)
 
 
-def create_log(*args, **kwargs):
+def create_log(*, habit_id, date, count=None):
     """Create and save a log into database, then return the log"""
-    log = Log(*args, **kwargs)
+    log = Log(habit_id=habit_id, date=date, count=count)
     log.save()
     return log
 

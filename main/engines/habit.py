@@ -13,9 +13,9 @@ def update_habit(habit_id, data):
     Habit.update_by_id(habit_id, data)
 
 
-def create_habit(*args, **kwargs):
+def create_habit(*, user_id, name, countable=None):
     """Create and save a habit into database, then return the habit"""
-    habit = Habit(*args, **kwargs)
+    habit = Habit(user_id=user_id, name=name, countable=countable)
     habit.save()
     return habit
 
