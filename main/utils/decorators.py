@@ -13,12 +13,20 @@ def load_body(schema):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            body = request.get_json(force=True)
-            errors = schema.validate(body)
-            if errors:
-                raise BadRequestError("Invalid field(s)", errors)
+            if request.method == "GET":
+                req_data = request.args
+                error_message = "Invalid query parameter(s)"
+            elif request.method == "PUT" or request.method == "POST":
+                req_data = request.get_json(force=True)
+                error_message = "Invalid field(s)"
+            else:
+                return func(*args, **kwargs)
 
-            data = schema.load(body)
+            errors = schema.validate(req_data)
+            if errors:
+                raise BadRequestError(error_message, errors)
+
+            data = schema.load(req_data)
             return func(*args, **kwargs, data=data)
 
         return wrapper

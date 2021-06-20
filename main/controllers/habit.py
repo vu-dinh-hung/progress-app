@@ -1,5 +1,5 @@
 """Module for habit_router blueprint"""
-from flask import Blueprint, request
+from flask import Blueprint
 from main.engines.habit import HabitEngine
 from main.engines.log import LogEngine
 from main.schemas.habit import (
@@ -13,7 +13,6 @@ from main.utils.decorators import (
     verify_user,
     verify_habit,
 )
-from main.exceptions import BadRequestError
 
 habit_router = Blueprint("habit_router", __name__)
 BASE_URL = "/users/<int:user_id>/habits"
@@ -21,21 +20,17 @@ BASE_URL = "/users/<int:user_id>/habits"
 
 @habit_router.route(BASE_URL, methods=["GET"])
 @verify_user
-def get_habits(user_id):
+@load_body(habit_query_params_schema)
+def get_habits(user_id, data):
     """GET habits"""
-    errors = habit_query_params_schema.validate(request.args)
-    if errors:
-        raise BadRequestError("Invalid query parameters", errors)
-
-    query_params = habit_query_params_schema.load(request.args)
     habits_per_page = 20
 
     habits = HabitEngine.get_habits_paginated(
-        user_id, query_params["page"], habits_per_page, False
+        user_id, data["page"], habits_per_page, False
     )
     for habit in habits:
         habit.logs = LogEngine.get_logs_by_habit_in_month(
-            habit.id, query_params["logyear"], query_params["logmonth"]
+            habit.id, data["logyear"], data["logmonth"]
         )
 
     return {
