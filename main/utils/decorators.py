@@ -8,7 +8,12 @@ from main.exceptions import BadRequestError, NotFoundError
 
 
 def load_data(schema):
-    """Validate and load request body/query params"""
+    """Validate and load request body/query params
+
+    View function should include a 'data' parameter.
+    Argument:
+    schema -- a schema to validate and load request data
+    """
 
     def decorator(func):
         @wraps(func)
@@ -35,7 +40,10 @@ def load_data(schema):
 
 
 def verify_user(func):
-    """Check whether jwt contains id that matches user_id in url"""
+    """Check whether jwt contains id that matches user_id in url
+
+    View function should include a 'user_id' parameter.
+    """
 
     @wraps(func)
     def wrapper(user_id, *args, **kwargs):
@@ -50,7 +58,10 @@ def verify_user(func):
 
 
 def verify_habit(func):
-    """Check that user with user_id owns habit_id"""
+    """Check that user with user_id owns habit_id
+
+    View function should include a 'habit_id' parameter.
+    """
 
     @wraps(func)
     def wrapper(user_id, habit_id, *args, **kwargs):
