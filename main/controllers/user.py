@@ -2,7 +2,7 @@
 # pylint: disable=unused-argument
 from flask import Blueprint
 from flask_jwt_extended import create_access_token
-from main.engines.user import get_user, update_user, create_user, get_user_by_username
+from main.engines.user import update_user, create_user, get_user_by_username
 from main.schemas.user import (
     user_schema,
     post_user_schema,
@@ -50,7 +50,6 @@ def get(user_id, user):
 @verify_user
 def put(user_id, user, data):
     """PUT user"""
-    update_user(user.id, data)
-    user = get_user(user.id)
+    updated_user = update_user(user, data)
 
-    return user_schema.dump(user), 200
+    return user_schema.dump(updated_user), 200

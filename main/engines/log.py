@@ -11,9 +11,10 @@ def get_log(log_id):
     return Log.find_by_id(log_id)
 
 
-def update_log(log_id, data):
+def update_log(log, data):
     """Update a log by id"""
-    Log.update_by_id(log_id, data)
+    Log.update_by_id(log.id, data)
+    return Log.find_by_id(log.id)
 
 
 def create_log(*, habit_id, date, count=None):

@@ -2,7 +2,6 @@
 # pylint: disable=unused-argument
 from flask import Blueprint
 from main.engines.habit import (
-    get_habit,
     update_habit,
     get_habits_paginated,
     get_habit_count,
@@ -62,7 +61,6 @@ def post(user_id, user, data):
 @load_data(put_habit_schema)
 def put(user_id, habit_id, user, habit, data):
     """PUT habit"""
-    update_habit(habit.id, data)
-    updated_habit = get_habit(habit.id)
+    updated_habit = update_habit(habit, data)
 
     return habit_schema.dump(updated_habit), 200

@@ -8,9 +8,10 @@ def get_user(user_id):
     return User.find_by_id(user_id)
 
 
-def update_user(user_id, data):
+def update_user(user, data):
     """Update an user by id"""
-    User.update_by_id(user_id, data)
+    User.update_by_id(user.id, data)
+    return User.find_by_id(user.id)
 
 
 def create_user(*, username, password_hash, name=None):

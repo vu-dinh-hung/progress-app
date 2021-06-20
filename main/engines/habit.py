@@ -8,9 +8,10 @@ def get_habit(habit_id):
     return Habit.find_by_id(habit_id)
 
 
-def update_habit(habit_id, data):
+def update_habit(habit, data):
     """Update a habit by id"""
-    Habit.update_by_id(habit_id, data)
+    Habit.update_by_id(habit.id, data)
+    return Habit.find_by_id(habit.id)
 
 
 def create_habit(*, user_id, name, countable=None):

@@ -1,7 +1,7 @@
 """Module for log_router blueprint"""
 # pylint: disable=unused-argument
 from flask import Blueprint
-from main.engines.log import get_log, update_log, create_log
+from main.engines.log import update_log, create_log
 from main.schemas.log import log_schema, post_log_schema, put_log_schema
 from main.utils.decorators import load_data, verify_user, verify_habit, verify_log
 
@@ -27,7 +27,6 @@ def post(user_id, habit_id, user, habit, data):
 @load_data(put_log_schema)
 def put(user_id, habit_id, log_id, user, habit, log, data):
     """PUT log"""
-    update_log(log.id, data)
-    updated_log = get_log(log.id)
+    updated_log = update_log(log, data)
 
     return log_schema.dump(updated_log), 200
