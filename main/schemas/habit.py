@@ -35,7 +35,7 @@ class NewHabitSchema(Schema):
     countable = fields.Boolean()
 
 
-class GetHabitQueryParamsSchema(Schema):
+class HabitQueryParamsSchema(Schema):
     """Schema for validating query params for GET habits (with nested logs)"""
 
     logyear = fields.Integer(
@@ -50,4 +50,4 @@ class GetHabitQueryParamsSchema(Schema):
 habit_schema = HabitSchema()
 habits_schema = HabitSchema(many=True)
 new_habit_schema = NewHabitSchema()
-get_habit_query_params_schema = GetHabitQueryParamsSchema()
+habit_query_params_schema = HabitQueryParamsSchema()

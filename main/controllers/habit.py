@@ -6,7 +6,7 @@ from main.schemas.habit import (
     habit_schema,
     habits_schema,
     new_habit_schema,
-    get_habit_query_params_schema,
+    habit_query_params_schema,
 )
 from main.utils.decorators import (
     load_body,
@@ -23,11 +23,11 @@ BASE_URL = "/users/<int:user_id>/habits"
 @verify_user
 def get_habits(user_id):
     """GET habits"""
-    errors = get_habit_query_params_schema.validate(request.args)
+    errors = habit_query_params_schema.validate(request.args)
     if errors:
         raise BadRequestError("Invalid query parameters", errors)
 
-    query_params = get_habit_query_params_schema.load(request.args)
+    query_params = habit_query_params_schema.load(request.args)
     habits_per_page = 20
 
     habits = HabitEngine.get_habits_paginated(
