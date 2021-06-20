@@ -7,7 +7,7 @@ from main.schemas.log import (
     new_log_schema,
     new_log_with_count_schema,
 )
-from main.utils.decorators import load_body, verify_user, verify_habit
+from main.utils.decorators import load_data, verify_user, verify_habit
 from main.enums import LogStatus
 from main.exceptions import BadRequestError, NotFoundError
 
@@ -48,7 +48,7 @@ def post_log(user_id, habit_id):  # pylint: disable=unused-argument
 @log_router.route(f"{BASE_URL}/logs/<int:log_id>", methods=["PUT"])
 @verify_habit
 @verify_user
-@load_body(log_schema)
+@load_data(log_schema)
 def put_log(data, user_id, habit_id, log_id):  # pylint: disable=unused-argument
     """PUT log"""
     log = LogEngine.find_by_id(log_id)

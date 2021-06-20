@@ -7,8 +7,8 @@ from main.engines.habit import HabitEngine
 from main.exceptions import BadRequestError, NotFoundError
 
 
-def load_body(schema):
-    """Validate and load request body"""
+def load_data(schema):
+    """Validate and load request body/query params"""
 
     def decorator(func):
         @wraps(func)

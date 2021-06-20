@@ -9,7 +9,7 @@ from main.schemas.habit import (
     habit_query_params_schema,
 )
 from main.utils.decorators import (
-    load_body,
+    load_data,
     verify_user,
     verify_habit,
 )
@@ -20,7 +20,7 @@ BASE_URL = "/users/<int:user_id>/habits"
 
 @habit_router.route(BASE_URL, methods=["GET"])
 @verify_user
-@load_body(habit_query_params_schema)
+@load_data(habit_query_params_schema)
 def get_habits(user_id, data):
     """GET habits"""
     habits_per_page = 20
@@ -42,7 +42,7 @@ def get_habits(user_id, data):
 
 @habit_router.route(BASE_URL, methods=["POST"])
 @verify_user
-@load_body(new_habit_schema)
+@load_data(new_habit_schema)
 def post_habit(data, user_id):
     """POST habit"""
     habit = HabitEngine.create_habit(**data, user_id=int(user_id))
@@ -51,7 +51,7 @@ def post_habit(data, user_id):
 
 
 @habit_router.route(f"{BASE_URL}/<int:habit_id>", methods=["PUT"])
-@load_body(habit_schema)
+@load_data(habit_schema)
 @verify_habit
 @verify_user
 def put_habit(data, user_id, habit_id):  # pylint: disable=unused-argument
