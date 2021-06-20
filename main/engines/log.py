@@ -16,8 +16,15 @@ def update_log(log_id, data):
 
 def create_log(*, habit_id, date, count=None):
     """Create and save a log into database, then return the log"""
-    log = Log(habit_id=habit_id, date=date, count=count)
-    log.save()
+    # if log for given date and habit already exists, set status of that log to 'active'
+    log = get_log_by_habit_and_date(habit_id, date)
+    if log:
+        log.status = LogStatus.ACTIVE
+        log.save()
+    else:
+        log = Log(habit_id=habit_id, date=date, count=count)
+        log.save()
+
     return log
 
 
