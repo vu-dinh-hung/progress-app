@@ -17,7 +17,7 @@ def create_user(*, username, password_hash, name=None):
     """Create and save an user into database, then return the user"""
     user = get_user_by_username(username)
     if user:
-        raise BadRequestError("Username already exists", {})
+        raise BadRequestError("Username already exists")
 
     user = User(username=username, password_hash=password_hash, name=name)
     user.save()

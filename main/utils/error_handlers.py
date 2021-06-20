@@ -29,7 +29,11 @@ def handle_http_errors(exc):
 
 def handle_bad_request(exc):
     """Handle BadRequestError"""
-    return {"message": exc.message, "data": exc.data}, 400
+    body = {"message": exc.message}
+    if exc.data is not None:
+        body["data"] = exc.data
+
+    return body, 400
 
 
 def handle_unauthorized(exc):

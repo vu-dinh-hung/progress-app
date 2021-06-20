@@ -5,7 +5,7 @@
 class BadRequestError(Exception):
     """Exception for 400 Bad Request errors"""
 
-    def __init__(self, message, data):
+    def __init__(self, message, data=None):
         self.message = message
         self.data = data
 
