@@ -2,8 +2,8 @@
 from functools import wraps
 from flask import request
 from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
-from main.engines.user import UserEngine
-from main.engines.habit import HabitEngine
+from main.engines.user import get_user
+from main.engines.habit import get_habit
 from main.exceptions import BadRequestError, NotFoundError
 
 
@@ -49,8 +49,13 @@ def verify_user(func):
     def wrapper(user_id, *args, **kwargs):
         verify_jwt_in_request()
         jwt_id = get_jwt_identity()
-        if user_id != jwt_id or not UserEngine.find_by_id(user_id):
-            raise NotFoundError("User not found")
+        error_message = "User not found"
+        if user_id != jwt_id:
+            raise NotFoundError(error_message)
+
+        user = get_user(user_id)
+        if not user:
+            raise NotFoundError(error_message)
 
         return func(*args, **kwargs, user_id=user_id)
 
@@ -65,7 +70,7 @@ def verify_habit(func):
 
     @wraps(func)
     def wrapper(user_id, habit_id, *args, **kwargs):
-        habit = HabitEngine.find_by_id(habit_id)
+        habit = get_habit(habit_id)
         if not habit or user_id != habit.user_id:
             raise NotFoundError("Habit not found")
 

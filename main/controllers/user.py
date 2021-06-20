@@ -1,7 +1,7 @@
 """Module for user_router blueprint"""
 from flask import Blueprint
 from flask_jwt_extended import create_access_token
-from main.engines.user import UserEngine
+from main.engines.user import get_user, update_user, create_user, get_user_by_username
 from main.schemas.user import user_schema, new_user_schema, login_schema
 from main.utils.decorators import load_data, verify_user
 from main.utils.password import check_password
@@ -14,7 +14,7 @@ user_router = Blueprint("user_router", __name__)
 @load_data(login_schema)
 def login(data):
     """POST login"""
-    user = UserEngine.find_by_username(data["username"])
+    user = get_user_by_username(data["username"])
     if not user or not check_password(data["password"], user.password_hash):
         raise UnauthorizedError("Wrong username or password")
 
@@ -25,18 +25,18 @@ def login(data):
 
 @user_router.route("/users", methods=["POST"])
 @load_data(new_user_schema)
-def post_user(data):
+def post(data):
     """POST user"""
-    user = UserEngine.create_user(**data)
+    user = create_user(**data)
 
     return user_schema.dump(user), 201
 
 
 @user_router.route("/users/<int:user_id>", methods=["GET"])
 @verify_user
-def get_user(user_id):
+def get(user_id):
     """GET user"""
-    user = UserEngine.find_by_id(user_id)
+    user = get_user(user_id)
     if not user:
         raise NotFoundError("User not found")
 
@@ -46,9 +46,9 @@ def get_user(user_id):
 @user_router.route("/users/<int:user_id>", methods=["PUT"])
 @load_data(user_schema)
 @verify_user
-def put_user(data, user_id):
+def put(data, user_id):
     """PUT user"""
-    UserEngine.update_by_id(user_id, data)
-    user = UserEngine.find_by_id(user_id)
+    update_user(user_id, data)
+    user = get_user(user_id)
 
     return user_schema.dump(user), 200

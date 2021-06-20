@@ -2,7 +2,7 @@
 from marshmallow import Schema, fields, validate, validates, ValidationError
 from marshmallow.decorators import post_load
 from main.schemas.base import BaseSchema
-from main.engines.user import UserEngine
+from main.engines.user import get_user_by_username
 from main.utils.password import hash_password
 
 
@@ -62,7 +62,7 @@ class NewUserSchema(Schema):
         self, username, **kwargs
     ):  # pylint: disable=no-self-use,unused-argument
         """Validator for duplicate username"""
-        user = UserEngine.find_by_username(username)
+        user = get_user_by_username(username)
         if user:
             raise ValidationError("Username already exists")
 

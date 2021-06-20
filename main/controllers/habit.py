@@ -1,13 +1,19 @@
 """Module for habit_router blueprint"""
 from flask import Blueprint
-from main.engines.habit import HabitEngine
-from main.engines.log import LogEngine
+from main.engines.habit import (
+    get_habit,
+    update_habit,
+    get_habits_paginated,
+    get_habit_count,
+    create_habit,
+)
 from main.schemas.habit import (
     habit_schema,
     habits_schema,
     new_habit_schema,
     habit_query_params_schema,
 )
+from main.engines.log import get_logs_by_habit_in_month
 from main.utils.decorators import (
     load_data,
     verify_user,
@@ -21,20 +27,18 @@ BASE_URL = "/users/<int:user_id>/habits"
 @habit_router.route(BASE_URL, methods=["GET"])
 @verify_user
 @load_data(habit_query_params_schema)
-def get_habits(user_id, data):
+def get(user_id, data):
     """GET habits"""
     habits_per_page = 20
 
-    habits = HabitEngine.get_habits_paginated(
-        user_id, data["page"], habits_per_page, False
-    )
+    habits = get_habits_paginated(user_id, data["page"], habits_per_page, False)
     for habit in habits:
-        habit.logs = LogEngine.get_logs_by_habit_in_month(
+        habit.logs = get_logs_by_habit_in_month(
             habit.id, data["logyear"], data["logmonth"]
         )
 
     return {
-        "total_habits": HabitEngine.get_habit_count(user_id),
+        "total_habits": get_habit_count(user_id),
         "habits_per_page": habits_per_page,
         "habits": habits_schema.dump(habits),
     }, 200
@@ -43,9 +47,9 @@ def get_habits(user_id, data):
 @habit_router.route(BASE_URL, methods=["POST"])
 @verify_user
 @load_data(new_habit_schema)
-def post_habit(data, user_id):
+def post(data, user_id):
     """POST habit"""
-    habit = HabitEngine.create_habit(**data, user_id=int(user_id))
+    habit = create_habit(**data, user_id=int(user_id))
 
     return habit_schema.dump(habit), 201
 
@@ -54,9 +58,9 @@ def post_habit(data, user_id):
 @load_data(habit_schema)
 @verify_habit
 @verify_user
-def put_habit(data, user_id, habit_id):  # pylint: disable=unused-argument
+def put(data, user_id, habit_id):  # pylint: disable=unused-argument
     """PUT habit"""
-    HabitEngine.update_by_id(habit_id, data)
-    updated_habit = HabitEngine.find_by_id(habit_id)
+    update_habit(habit_id, data)
+    updated_habit = get_habit(habit_id)
 
     return habit_schema.dump(updated_habit), 200
