@@ -31,16 +31,16 @@ class Base(Model):
     )
 
     @classmethod
-    def find_by_id(cls, _id):
+    def find_by_id(cls, _id: int):
         """Return the resource with the given id
         or None if the id doesn't exist"""
         return cls.query.get(_id)
 
     @classmethod
-    def update_by_id(cls, _id, data_dict):
+    def update_by_id(cls, _id: int, data: dict):
         """Update the resource with the given id using data_dict"""
         with session_scope() as session:
-            session.query(cls).filter_by(id=_id).update(data_dict)
+            session.query(cls).filter_by(id=_id).update(data)
 
     def save(self):
         """Add/update this resource in the database"""

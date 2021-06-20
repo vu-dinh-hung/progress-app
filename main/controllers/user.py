@@ -2,6 +2,7 @@
 # pylint: disable=unused-argument
 from flask import Blueprint
 from flask_jwt_extended import create_access_token
+from main.models.user import User
 from main.engines.user import update_user, create_user, get_user_by_username
 from main.schemas.user import (
     user_schema,
@@ -18,7 +19,7 @@ user_router = Blueprint("user_router", __name__)
 
 @user_router.route("/login", methods=["POST"])
 @load_data(login_schema)
-def login(data):
+def login(data: dict):
     """POST login"""
     user = get_user_by_username(data["username"])
     if not user or not check_password(data["password"], user.password_hash):
@@ -31,7 +32,7 @@ def login(data):
 
 @user_router.route("/users", methods=["POST"])
 @load_data(post_user_schema)
-def post(data):
+def post(data: dict):
     """POST user"""
     user = create_user(**data)
 
@@ -40,7 +41,7 @@ def post(data):
 
 @user_router.route("/users/<int:user_id>", methods=["GET"])
 @verify_user
-def get(user_id, user):
+def get(user_id: int, user: User):
     """GET user"""
     return user_schema.dump(user), 200
 
@@ -48,7 +49,7 @@ def get(user_id, user):
 @user_router.route("/users/<int:user_id>", methods=["PUT"])
 @load_data(put_user_schema)
 @verify_user
-def put(user_id, user, data):
+def put(user_id: int, user: User, data: dict):
     """PUT user"""
     updated_user = update_user(user, data)
 

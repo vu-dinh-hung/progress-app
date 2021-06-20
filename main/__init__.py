@@ -21,7 +21,7 @@ from main.utils.error_handlers import (
 jwt = JWTManager()
 
 
-def create_app(config_name):
+def create_app(config_name: str):
     """Return initialized and configured Flask app"""
     app = Flask(__name__)
     app.config.from_object(config[config_name])

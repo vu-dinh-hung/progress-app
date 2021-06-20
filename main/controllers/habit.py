@@ -1,6 +1,8 @@
 """Module for habit_router blueprint"""
 # pylint: disable=unused-argument
 from flask import Blueprint
+from main.models.user import User
+from main.models.habit import Habit
 from main.engines.habit import (
     update_habit,
     get_habits_paginated,
@@ -28,7 +30,7 @@ BASE_URL = "/users/<int:user_id>/habits"
 @habit_router.route(BASE_URL, methods=["GET"])
 @verify_user
 @load_data(habit_query_params_schema)
-def get(user_id, user, data):
+def get(user_id: int, user: User, data: dict):
     """GET habits"""
     habits_per_page = 20
 
@@ -48,7 +50,7 @@ def get(user_id, user, data):
 @habit_router.route(BASE_URL, methods=["POST"])
 @verify_user
 @load_data(post_habit_schema)
-def post(user_id, user, data):
+def post(user_id: int, user: User, data: dict):
     """POST habit"""
     habit = create_habit(**data, user_id=user.id)
 
@@ -59,7 +61,7 @@ def post(user_id, user, data):
 @verify_user
 @verify_habit
 @load_data(put_habit_schema)
-def put(user_id, habit_id, user, habit, data):
+def put(user_id: int, habit_id: int, user: User, habit: Habit, data: dict):
     """PUT habit"""
     updated_habit = update_habit(habit, data)
 
