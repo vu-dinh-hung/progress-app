@@ -1,8 +1,7 @@
 """Module for marshmallow schemas for user"""
-from marshmallow import Schema, fields, validate, validates, ValidationError
+from marshmallow import Schema, fields, validate, ValidationError
 from marshmallow.decorators import post_load
 from main.schemas.base import BaseSchema
-from main.engines.user import get_user_by_username
 from main.utils.password import hash_password
 
 
@@ -56,15 +55,6 @@ class NewUserSchema(Schema):
         error_messages={"required": "Password required"},
     )
     name = fields.String()
-
-    @validates("username")
-    def check_duplicate_username(
-        self, username, **kwargs
-    ):  # pylint: disable=no-self-use,unused-argument
-        """Validator for duplicate username"""
-        user = get_user_by_username(username)
-        if user:
-            raise ValidationError("Username already exists")
 
     @post_load
     def make_password_hash(

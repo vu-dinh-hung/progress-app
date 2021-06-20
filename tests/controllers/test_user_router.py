@@ -116,7 +116,6 @@ def test_post_user_errors_duplicate_username(client, db_populated, users_in_db_g
 
     assert len(users_after) == len(users_before)
     assert res.status_code == 400
-    assert res.json["data"]["username"]
 
 
 def test_get_user(client, db_populated, users_in_db_getter, jwt_user_0):

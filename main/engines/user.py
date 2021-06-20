@@ -1,4 +1,5 @@
 """Module for user-related operations"""
+from main.exceptions import BadRequestError
 from main.models.user import User
 
 
@@ -12,9 +13,12 @@ def update_user(user_id, data):
     User.update_by_id(user_id, data)
 
 
-def create_user(*args, **kwargs):
+def create_user(*, username, password_hash, name=None):
     """Create and save an user into database, then return the user"""
-    user = User(*args, **kwargs)
+    user = get_user_by_username(username)
+    if user:
+        raise BadRequestError("Username already exists", {})
+    user = User(username=username, password_hash=password_hash, name=name)
     user.save()
     return user
 
