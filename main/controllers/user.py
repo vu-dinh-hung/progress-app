@@ -1,26 +1,21 @@
 """Module for user_router blueprint"""
-from flask import Blueprint, request
+from flask import Blueprint
 from flask_jwt_extended import create_access_token
 from main.engines.user import UserEngine
 from main.schemas.user import user_schema, new_user_schema, login_schema
-from main.utils.decorators import verify_user
+from main.utils.decorators import load_body, verify_user
 from main.utils.password import check_password
-from main.exceptions import BadRequestError, UnauthorizedError, NotFoundError
+from main.exceptions import UnauthorizedError, NotFoundError
 
 user_router = Blueprint("user_router", __name__)
 
 
 @user_router.route("/login", methods=["POST"])
-def login():
+@load_body(login_schema)
+def login(data):
     """POST login"""
-    body = request.get_json(force=True)
-    errors = login_schema.validate(body)
-    if errors:
-        raise BadRequestError("Missing field(s)", errors)
-
-    credentials = login_schema.load(body)
-    user = UserEngine.find_by_username(credentials["username"])
-    if not user or not check_password(credentials["password"], user.password_hash):
+    user = UserEngine.find_by_username(data["username"])
+    if not user or not check_password(data["password"], user.password_hash):
         raise UnauthorizedError("Wrong username or password")
 
     access_token = create_access_token(identity=user.id, fresh=True)
@@ -29,15 +24,10 @@ def login():
 
 
 @user_router.route("/users", methods=["POST"])
-def post_user():
+@load_body(new_user_schema)
+def post_user(data):
     """POST user"""
-    body = request.get_json(force=True)
-    errors = new_user_schema.validate(body)
-    if errors:
-        raise BadRequestError("Invalid field(s)", errors)
-
-    user_data = new_user_schema.load(body)
-    user = UserEngine.create_user(**user_data)
+    user = UserEngine.create_user(**data)
 
     return user_schema.dump(user), 201
 
@@ -54,16 +44,11 @@ def get_user(user_id):
 
 
 @user_router.route("/users/<int:user_id>", methods=["PUT"])
+@load_body(user_schema)
 @verify_user
-def put_user(user_id):
+def put_user(data, user_id):
     """PUT user"""
-    body = request.get_json(force=True)
-    errors = user_schema.validate(body)
-    if errors:
-        raise BadRequestError("Invalid field(s)", errors)
-
-    update_data = user_schema.load(body)
-    UserEngine.update_by_id(user_id, update_data)
+    UserEngine.update_by_id(user_id, data)
     user = UserEngine.find_by_id(user_id)
 
     return user_schema.dump(user), 200

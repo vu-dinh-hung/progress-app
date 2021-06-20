@@ -9,6 +9,7 @@ from main.schemas.habit import (
     get_habit_query_params_schema,
 )
 from main.utils.decorators import (
+    load_body,
     verify_user,
     verify_habit,
 )
@@ -46,31 +47,21 @@ def get_habits(user_id):
 
 @habit_router.route(BASE_URL, methods=["POST"])
 @verify_user
-def post_habit(user_id):
+@load_body(new_habit_schema)
+def post_habit(data, user_id):
     """POST habit"""
-    body = request.get_json(force=True)
-    errors = new_habit_schema.validate(body)
-    if errors:
-        raise BadRequestError("Invalid field(s)", errors)
-
-    habit_data = new_habit_schema.load(body)
-    habit = HabitEngine.create_habit(**habit_data, user_id=int(user_id))
+    habit = HabitEngine.create_habit(**data, user_id=int(user_id))
 
     return habit_schema.dump(habit), 201
 
 
 @habit_router.route(f"{BASE_URL}/<int:habit_id>", methods=["PUT"])
-@verify_user
+@load_body(habit_schema)
 @verify_habit
-def put_habit(user_id, habit_id):  # pylint: disable=unused-argument
+@verify_user
+def put_habit(data, user_id, habit_id):  # pylint: disable=unused-argument
     """PUT habit"""
-    body = request.get_json(force=True)
-    errors = habit_schema.validate(body)
-    if errors:
-        raise BadRequestError("Invalid field(s)", errors)
-
-    habit_data = habit_schema.load(body)
-    HabitEngine.update_by_id(habit_id, habit_data)
+    HabitEngine.update_by_id(habit_id, data)
     updated_habit = HabitEngine.find_by_id(habit_id)
 
     return habit_schema.dump(updated_habit), 200

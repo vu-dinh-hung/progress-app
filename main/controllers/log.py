@@ -7,7 +7,7 @@ from main.schemas.log import (
     new_log_schema,
     new_log_with_count_schema,
 )
-from main.utils.decorators import verify_user, verify_habit
+from main.utils.decorators import load_body, verify_user, verify_habit
 from main.enums import LogStatus
 from main.exceptions import BadRequestError, NotFoundError
 
@@ -16,8 +16,8 @@ BASE_URL = "/users/<int:user_id>/habits/<int:habit_id>"
 
 
 @log_router.route(f"{BASE_URL}/logs", methods=["POST"])
-@verify_user
 @verify_habit
+@verify_user
 def post_log(user_id, habit_id):  # pylint: disable=unused-argument
     """POST log"""
     habit = HabitEngine.find_by_id(habit_id)
@@ -46,21 +46,16 @@ def post_log(user_id, habit_id):  # pylint: disable=unused-argument
 
 
 @log_router.route(f"{BASE_URL}/logs/<int:log_id>", methods=["PUT"])
-@verify_user
 @verify_habit
-def put_log(user_id, habit_id, log_id):  # pylint: disable=unused-argument
+@verify_user
+@load_body(log_schema)
+def put_log(data, user_id, habit_id, log_id):  # pylint: disable=unused-argument
     """PUT log"""
     log = LogEngine.find_by_id(log_id)
     if not log or habit_id != log.habit_id:
         raise NotFoundError("Log not found")
 
-    body = request.get_json(force=True)
-    errors = log_schema.validate(body)
-    if errors:
-        raise BadRequestError("Invalid field(s)", errors)
-
-    log_data = log_schema.load(body)
-    LogEngine.update_by_id(log_id, log_data)
+    LogEngine.update_by_id(log_id, data)
     updated_log = LogEngine.find_by_id(log_id)
 
     return log_schema.dump(updated_log), 200
