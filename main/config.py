@@ -12,6 +12,7 @@ class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "defaulthardtoguessstring")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     HABITS_PER_PAGE = 20
+    LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
 
 
 class DevelopmentConfig(Config):
