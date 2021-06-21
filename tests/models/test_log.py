@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from main.models.log import Log
 
 
-def test_log_create(db_populated, habits_in_db_getter, logs_in_db_getter):
+def test_log_create(db_populate_logs, habits_in_db_getter, logs_in_db_getter):
     """Test that valid logs are created correctly"""
     logs_before = logs_in_db_getter()
     habits = habits_in_db_getter()
@@ -21,7 +21,7 @@ def test_log_create(db_populated, habits_in_db_getter, logs_in_db_getter):
     assert new_log_in_db.count == new_log.count
 
 
-def test_log_create_errors(db_populated, habits_in_db_getter, logs_in_db_getter):
+def test_log_create_errors(db_populate_logs, habits_in_db_getter, logs_in_db_getter):
     """Test that invalid logs are not created"""
     logs_before = logs_in_db_getter()
     habits = habits_in_db_getter()
@@ -38,7 +38,7 @@ def test_log_create_errors(db_populated, habits_in_db_getter, logs_in_db_getter)
     assert len(logs_after) == len(logs_before)
 
 
-def test_log_read(db_populated, logs_in_db_getter):
+def test_log_read(db_populate_logs, logs_in_db_getter):
     """Test that logs are fetched correctly"""
     logs = logs_in_db_getter()
     log0 = Log.find_by_id(logs[0].id)
@@ -48,7 +48,7 @@ def test_log_read(db_populated, logs_in_db_getter):
     assert log1 == logs[1]
 
 
-def test_log_update(db_populated, logs_in_db_getter):
+def test_log_update(db_populate_logs, logs_in_db_getter):
     """Test that valid logs are updated correctly"""
     logs_before = logs_in_db_getter()
     updated_log = logs_before[0]

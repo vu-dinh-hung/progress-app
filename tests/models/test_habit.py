@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from main.models.habit import Habit
 
 
-def test_habit_create(db_populated, users_in_db_getter, habits_in_db_getter):
+def test_habit_create(db_populate_habits, users_in_db_getter, habits_in_db_getter):
     """Test that valid habits are created correctly"""
     habits_before = habits_in_db_getter()
     users = users_in_db_getter()
@@ -20,7 +20,9 @@ def test_habit_create(db_populated, users_in_db_getter, habits_in_db_getter):
     assert new_habit_in_db.countable == new_habit.countable
 
 
-def test_habit_create_errors(db_populated, users_in_db_getter, habits_in_db_getter):
+def test_habit_create_errors(
+    db_populate_habits, users_in_db_getter, habits_in_db_getter
+):
     """Test that invalid habits are not created"""
     habits_before = habits_in_db_getter()
     users = users_in_db_getter()
@@ -37,7 +39,7 @@ def test_habit_create_errors(db_populated, users_in_db_getter, habits_in_db_gett
     assert len(habits_after) == len(habits_before)
 
 
-def test_habit_read(db_populated, habits_in_db_getter):
+def test_habit_read(db_populate_habits, habits_in_db_getter):
     """Test that habits are fetched correctly"""
     habits = habits_in_db_getter()
     habit0 = Habit.find_by_id(habits[0].id)
@@ -47,7 +49,7 @@ def test_habit_read(db_populated, habits_in_db_getter):
     assert habit1 == habits[1]
 
 
-def test_habit_update(db_populated, habits_in_db_getter):
+def test_habit_update(db_populate_habits, habits_in_db_getter):
     """Test that valid habits are updated correctly"""
     habits_before = habits_in_db_getter()
     updated_habit = habits_before[0]

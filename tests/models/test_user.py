@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from main.models.user import User
 
 
-def test_user_create(db_populated, users_in_db_getter):
+def test_user_create(db_populate_users, users_in_db_getter):
     """Test that valid users are created correctly"""
     users_before = users_in_db_getter()
     new_user = User(username="newuser", password_hash="abcde12345")
@@ -19,7 +19,7 @@ def test_user_create(db_populated, users_in_db_getter):
     assert new_user_in_db.name == new_user.name
 
 
-def test_user_create_errors(db_populated, users_in_db_getter):
+def test_user_create_errors(db_populate_users, users_in_db_getter):
     """Test that invalid users are not created"""
     users_before = users_in_db_getter()
 
@@ -41,7 +41,7 @@ def test_user_create_errors(db_populated, users_in_db_getter):
     assert len(users_after) == len(users_before)
 
 
-def test_user_read(db_populated, users_in_db_getter):
+def test_user_read(db_populate_users, users_in_db_getter):
     """Test that users are fetched correctly"""
     users = users_in_db_getter()
     user0 = User.find_by_id(users[0].id)
@@ -49,7 +49,7 @@ def test_user_read(db_populated, users_in_db_getter):
     assert user0 == users[0]
 
 
-def test_user_update(db_populated, users_in_db_getter):
+def test_user_update(db_populate_users, users_in_db_getter):
     """Test that valid users are updated correctly"""
     users_before = users_in_db_getter()
     updated_user = users_before[0]

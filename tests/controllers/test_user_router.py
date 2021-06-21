@@ -4,9 +4,9 @@ import json
 import pytest
 
 
-def test_login(client, db_populated):
+def test_login(client, db_populate_users):
     """Test that user can login"""
-    user_dicts = db_populated["user_dicts"]
+    user_dicts = db_populate_users
     res = client.post(
         "/api/login",
         data=json.dumps(
@@ -89,7 +89,7 @@ def test_post_user(client, users_in_db_getter, user_data):
     ],
 )
 def test_post_user_errors(
-    client, db_populated, users_in_db_getter, user_data, invalid_field
+    client, db_populate_users, users_in_db_getter, user_data, invalid_field
 ):
     """Test that invalid user data are not POSTed, and 400 is returned"""
     users_before = users_in_db_getter()
@@ -103,7 +103,9 @@ def test_post_user_errors(
     assert res.json["data"][invalid_field]
 
 
-def test_post_user_errors_duplicate_username(client, db_populated, users_in_db_getter):
+def test_post_user_errors_duplicate_username(
+    client, db_populate_users, users_in_db_getter
+):
     """Test that user data with duplicate username is not POSTed, and 400 is returned"""
     users_before = users_in_db_getter()
 
@@ -118,7 +120,7 @@ def test_post_user_errors_duplicate_username(client, db_populated, users_in_db_g
     assert res.status_code == 400
 
 
-def test_get_user(client, db_populated, users_in_db_getter, jwt_user_0):
+def test_get_user(client, db_populate_users, users_in_db_getter, jwt_user_0):
     """Test that user is GET correctly"""
     users = users_in_db_getter()
 
@@ -132,7 +134,7 @@ def test_get_user(client, db_populated, users_in_db_getter, jwt_user_0):
     assert res.json.get("name") == users[0].name
 
 
-def test_get_user_errors(client, db_populated, users_in_db_getter, jwt_user_0):
+def test_get_user_errors(client, db_populate_users, users_in_db_getter, jwt_user_0):
     """Test that without proper auth, user GET fails correctly"""
     users = users_in_db_getter()
 
@@ -155,7 +157,7 @@ def test_get_user_errors(client, db_populated, users_in_db_getter, jwt_user_0):
     ],
 )
 def test_put_user(
-    client, db_populated, users_in_db_getter, jwt_user_0, login, user_data
+    client, db_populate_users, users_in_db_getter, jwt_user_0, login, user_data
 ):
     """Test that users can be PUT correctly with valid data"""
     users_before = users_in_db_getter()
@@ -186,7 +188,7 @@ def test_put_user(
     ],
 )
 def test_put_user_errors(
-    client, db_populated, users_in_db_getter, jwt_user_0, user_data, invalid_field
+    client, db_populate_users, users_in_db_getter, jwt_user_0, user_data, invalid_field
 ):
     """Test that invalid user data are not PUT"""
     users_before = users_in_db_getter()

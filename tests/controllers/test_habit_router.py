@@ -5,7 +5,7 @@ import pytest
 
 
 def test_get_habits(
-    client, db_populated, users_in_db_getter, habits_in_db_getter, jwt_user_0
+    client, db_populate_logs, users_in_db_getter, habits_in_db_getter, jwt_user_0
 ):
     """Test that habits are GET correctly"""
     users = users_in_db_getter()
@@ -30,7 +30,7 @@ def test_get_habits(
     assert len([log for habit in res2.json["habits"] for log in habit["logs"]]) == 0
 
 
-def test_get_habits_errors(client, db_populated, users_in_db_getter, jwt_user_0):
+def test_get_habits_errors(client, db_populate_habits, users_in_db_getter, jwt_user_0):
     """Test that invalid GET requests return the correct errors"""
     users = users_in_db_getter()
 
@@ -69,7 +69,7 @@ def test_get_habits_errors(client, db_populated, users_in_db_getter, jwt_user_0)
 )
 def test_post_habit(
     client,
-    db_populated,
+    db_populate_habits,
     users_in_db_getter,
     habits_in_db_getter,
     jwt_user_0,
@@ -104,7 +104,7 @@ def test_post_habit(
 )
 def test_post_habit_errors(
     client,
-    db_populated,
+    db_populate_habits,
     users_in_db_getter,
     habits_in_db_getter,
     jwt_user_0,
@@ -135,7 +135,7 @@ def test_post_habit_errors(
 )
 def test_put_habit(
     client,
-    db_populated,
+    db_populate_habits,
     users_in_db_getter,
     habits_in_db_getter,
     jwt_user_0,
@@ -170,7 +170,7 @@ def test_put_habit(
 )
 def test_put_habit_errors_invalid_data(
     client,
-    db_populated,
+    db_populate_habits,
     users_in_db_getter,
     habits_in_db_getter,
     jwt_user_0,

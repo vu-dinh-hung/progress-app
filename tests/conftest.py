@@ -39,16 +39,11 @@ def db_empty():
 
 
 @pytest.fixture()
-def db_populated(db_empty, users_in_db_getter, habits_in_db_getter):
-    """Add test data to db"""
+def db_populate_users():
+    """Add test users to db"""
     test_user_dicts = (
         {"username": "testuser0", "password": "p4ssw0rd", "name": "Main Tester"},
         {"username": "testuser1", "password": "p4ssw0rd1"},
-    )
-    test_habit_dicts = ({"name": "run", "countable": True}, {"name": "read"})
-    test_log_dicts = (
-        {"date": datetime.date(2021, 6, 2), "count": 12},
-        {"date": datetime.date(2021, 6, 3), "count": 13},
     )
 
     for user_dict in test_user_dicts:
@@ -62,27 +57,41 @@ def db_populated(db_empty, users_in_db_getter, habits_in_db_getter):
         db.session.add(user)
     db.session.commit()
 
+    return test_user_dicts
+
+
+@pytest.fixture()
+def db_populate_habits(db_populate_users, users_in_db_getter):
+    """Add test habits to db"""
+    test_habit_dicts = ({"name": "run", "countable": True}, {"name": "read"})
     for habit_dict in test_habit_dicts:
         habit = Habit(**habit_dict, user_id=users_in_db_getter()[0].id)
         db.session.add(habit)
     db.session.commit()
+
+    return test_habit_dicts
+
+
+@pytest.fixture()
+def db_populate_logs(db_populate_habits, habits_in_db_getter):
+    """Add test logs to db"""
+    test_log_dicts = (
+        {"date": datetime.date(2021, 6, 2), "count": 12},
+        {"date": datetime.date(2021, 6, 3), "count": 13},
+    )
 
     for log_dict in test_log_dicts:
         log = Log(**log_dict, habit_id=habits_in_db_getter()[0].id)
         db.session.add(log)
     db.session.commit()
 
-    return {
-        "user_dicts": test_user_dicts,
-        "habit_dicts": test_habit_dicts,
-        "log_dicts": test_log_dicts,
-    }
+    return test_log_dicts
 
 
 @pytest.fixture()
-def jwt_user_0(client, db_populated):
+def jwt_user_0(client, db_populate_users):
     """Return JWT for main tester user"""
-    user_dict = db_populated["user_dicts"][0]
+    user_dict = db_populate_users[0]
     res = client.post(
         "/api/login",
         data=json.dumps(
@@ -93,7 +102,7 @@ def jwt_user_0(client, db_populated):
 
 
 @pytest.fixture()
-def login(client, db_populated):
+def login(client, db_populate_users):
     """Return a login function for a username-password pair"""
 
     def login(username, password):

@@ -13,7 +13,7 @@ import pytest
 )
 def test_post_log_with_count(
     client,
-    db_populated,
+    db_populate_logs,
     users_in_db_getter,
     habits_in_db_getter,
     logs_in_db_getter,
@@ -49,7 +49,7 @@ def test_post_log_with_count(
 )
 def test_post_log_without_count(
     client,
-    db_populated,
+    db_populate_logs,
     users_in_db_getter,
     habits_in_db_getter,
     logs_in_db_getter,
@@ -87,7 +87,7 @@ def test_post_log_without_count(
 )
 def test_post_log_errors(
     client,
-    db_populated,
+    db_populate_logs,
     users_in_db_getter,
     habits_in_db_getter,
     logs_in_db_getter,
@@ -121,7 +121,7 @@ def test_post_log_errors(
 )
 def test_put_log(
     client,
-    db_populated,
+    db_populate_logs,
     users_in_db_getter,
     habits_in_db_getter,
     logs_in_db_getter,
