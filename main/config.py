@@ -13,6 +13,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     HABITS_PER_PAGE = 20
     LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
+    LOG_FILE = os.environ.get("LOG_FILE", "app.log")
 
 
 class DevelopmentConfig(Config):

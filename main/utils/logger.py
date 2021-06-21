@@ -5,6 +5,7 @@ from logging.config import dictConfig
 def init_logger(app):
     """Initialize app logger with app.config"""
     log_level = app.config["LOG_LEVEL"]
+    log_file = app.config["LOG_FILE"]
     log_config = {
         "version": 1,
         "formatters": {
@@ -16,7 +17,7 @@ def init_logger(app):
             "rotating_file": {
                 "level": log_level,
                 "class": "logging.handlers.RotatingFileHandler",
-                "filename": "app.log",
+                "filename": log_file,
                 "backupCount": 4,
                 "maxBytes": 100000,
                 "formatter": "default",
