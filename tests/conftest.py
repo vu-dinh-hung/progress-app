@@ -33,9 +33,10 @@ def client(app):
 @pytest.fixture(autouse=True)
 def db_empty():
     """Empty the test db"""
-    db.session.close()
-    db.drop_all()
-    db.create_all()
+    Log.query.delete()
+    Habit.query.delete()
+    User.query.delete()
+    db.session.commit()
 
 
 @pytest.fixture()
