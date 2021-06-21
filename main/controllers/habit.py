@@ -1,6 +1,6 @@
 """Module for habit_router blueprint"""
 # pylint: disable=unused-argument
-from flask import Blueprint
+from flask import Blueprint, current_app
 from main.models.user import User
 from main.models.habit import Habit
 from main.engines.habit import (
@@ -32,7 +32,7 @@ BASE_URL = "/users/<int:user_id>/habits"
 @load_data(habit_query_params_schema)
 def get(user_id: int, user: User, data: dict):
     """GET habits"""
-    habits_per_page = 20
+    habits_per_page = current_app.config["HABITS_PER_PAGE"]
 
     habits = get_habits_paginated(user.id, data["page"], habits_per_page, False)
     for habit in habits:
